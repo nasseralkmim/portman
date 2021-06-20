@@ -1,7 +1,59 @@
 =portman= is a simple package to manage your portfolio.
 
+* Features
+
+1. Simple input file
+2. Compute average purchase price
+3. Visualize your portfolio
+
 * Input
 The input is a simple =.csv= file with your transaction history.
-The output contains:
-1. net amounts;
-2. average purchase price;
+
+#+begin_src shell
+cat examples/trades.csv
+#+end_src
+
+#+RESULTS:
+#+begin_example
+date,type,ticker,volume,price,total,vol_adj
+2018-09-17,Buy,EGIE3,40,36.5,1460.0,40
+2018-10-03,Buy,ABEV3,28,18.26,511.28000000000003,28
+2018-10-16,Buy,ABEV3,30,17.29,518.6999999999999,30
+2018-11-07,Buy,ABEV3,25,16.8,420.0,25
+2018-12-12,Split,EGIE3,10,0.0,0.0,10
+2019-03-15,Sell,EGIE3,25,39.0,-975.0,-25
+2020-03-25,Buy,EGIE3,15,38.0,570.0,15
+2020-03-25,Buy,EGIE3,10,37.5,375.0,10
+2020-07-27,Buy,EGIE3,32,44.7,1430.4,32
+#+end_example
+
+* Usage
+:PROPERTIES:
+:header-args:python: :session demo
+:END:
+
+#+begin_src python
+import portman.trades
+import portman.portfolio
+
+td = portman.trades.process("examples/trade_data.csv")
+por = portman.portfolio.process(td)
+#+end_src
+
+#+RESULTS:
+
+Then the presentation, 
+
+#+begin_src python
+import portman.visualize
+import matplotlib.pyplot as plt
+portman.visualize.allocation('examples/portfolio.csv')
+portman.visualize.summary('examples/portfolio.csv')
+plt.show()
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+[[file:./jupyter/38b84ee5b2accdf7a36f39a9f5644f7a7e9daff7.png]]
+[[file:./jupyter/dfdc5c4d5a2798b18d9ae730e48a04b812cf20c6.png]]
+:END:
