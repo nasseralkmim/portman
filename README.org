@@ -3,8 +3,8 @@
 * Features
 
 1. Simple input file
-2. Compute average purchase price
-3. Visualize your portfolio
+2. Snapshot of portfolio core information
+3. Visualize your portfolio in a dashboard
 
 * Input
 The input is a simple =.csv= file with your transaction history.
