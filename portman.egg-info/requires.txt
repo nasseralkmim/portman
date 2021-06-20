@@ -1,4 +1,0 @@
-yahooquery
-pandas
-matplotlib
-numpy
