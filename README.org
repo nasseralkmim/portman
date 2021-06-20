@@ -1,0 +1,7 @@
+=portman= is a simple package to manage your portfolio.
+
+* Input
+The input is a simple =.csv= file with your transaction history.
+The output contains:
+1. net amounts;
+2. average purchase price;
