@@ -1,9 +1,15 @@
+"""Process the trades DataFrame."""
 import pandas as pd
 import yahooquery as yf
 
 
-def process_portfolio(trades):
-    """consolidates trade data into a portfolio with current holdings """
+def process(trades):
+    """Consolidates trade data into a portfolio with current holdings.
+
+    Args:
+        trades : DataFrame
+
+    """
     portfolio = pd.DataFrame()
     portfolio["Vol. liq."] = trades.groupby("ticker")["vol_adj"].sum()
     portfolio["Avg. price (R$)"] = (
