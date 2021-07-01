@@ -1,10 +1,14 @@
-=portman= is a simple package to manage your portfolio.
+=portman= is a package to manage your portfolio.
 
 * Features
 
-1. Simple input file
-2. Snapshot of portfolio core information
-3. Visualize your portfolio in a dashboard
+1. Simple =.csv= input file
+2. Snapshot of portfolio *core* information
+   1. holdings net volume (what do you have?)
+   2. average purchase price (how much did you pay for it?)
+   3. current quote (what is the current price?)
+   4. profit and loss on position (how much I'm gaining or losing?)
+   5. equity distribution by value and industry (how diversified are my holdings?)
 
 * Input
 The input is a simple =.csv= file with your transaction history.
@@ -27,10 +31,12 @@ date,type,ticker,volume,price,total,vol_adj
 2020-07-27,Buy,EGIE3,32,44.7,1430.4,32
 #+end_example
 
-* Usage
+* Use =portman=
 :PROPERTIES:
 :header-args:python: :session demo
 :END:
+
+Generates a =.csv= file.
 
 #+begin_src python
 import portman.trades
@@ -38,22 +44,31 @@ import portman.portfolio
 
 td = portman.trades.process("examples/trade_data.csv")
 por = portman.portfolio.process(td)
+print(por)
 #+end_src
 
 #+RESULTS:
+:         Net vol.  Avg. price ($)  Quote ($)      P/L %  Cur. val. ($)  \
+: ticker                                                                  
+: ABEV3         83       17.469639      16.91  -3.203492        1403.53   
+: EGIE3         82       34.882927      39.90  14.382604        3271.80   
+: 
+:                     Sector  
+: ticker                      
+: ABEV3   Consumer Defensive  
+: EGIE3            Utilities  
 
-Then the presentation, 
 
-#+begin_src python
-import portman.visualize
-import matplotlib.pyplot as plt
-portman.visualize.allocation('examples/portfolio.csv')
-portman.visualize.summary('examples/portfolio.csv')
-plt.show()
-#+end_src
+* Concepts
+** Value, quote and price
 
-#+RESULTS:
-:RESULTS:
-[[file:./jupyter/38b84ee5b2accdf7a36f39a9f5644f7a7e9daff7.png]]
-[[file:./jupyter/dfdc5c4d5a2798b18d9ae730e48a04b812cf20c6.png]]
-:END:
+
+
+* Todo
+1. check how average price was computed (trade.py).
+2. check how import/export from potfolio-performance works.
+   1. csv, good and complete, but it is not as smooth as I expected.
+
+* Changelog
+
+1. <2021-06-28 Mon> Moved visualization to a different package, =portvis=.
