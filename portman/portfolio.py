@@ -26,13 +26,13 @@ def process(trades):
 
 
 def net_position(trades, portfolio):
-    """Compute net position from trades
+    """Compute net position from trades.
 
     Introduces a new column into the portfolio DataFrame
 
     Args:
-        trades : DataFrame
-        portfolio : DataFrame
+        trades (DataFrame): processed trades.
+        portfolio (DataFrame): processed portfolio.
 
     """
     portfolio[labels.NET_POS] = trades.groupby("ticker")[labels.ADJUSTED_VOL].sum()
@@ -41,14 +41,14 @@ def net_position(trades, portfolio):
 
 
 def average_purchase_price(trades, portfolio):
-    """Compute average purchase price of unique tickers in a DataFrame
-
-    Introduces a new column into the portfolio DataFrame
+    """Compute average purchase price of an asset and adds new column
 
     Args:
-        trades : DataFrame
+        trades (DataFrame): processed trades.
 
     """
+    # naive implementation, just sum total and divide by net position
+    # TODO need to accounts for 
     portfolio[labels.AVG_PRICE] = (
         trades.groupby("ticker")[labels.TOTAL_INVESTED].sum() / portfolio[labels.NET_POS]
     )
@@ -63,7 +63,7 @@ def current_price(portfolio):
     Introduces a new column into the portfolio DataFrame
 
     Args:
-        portfolio : DataFrame
+        portfolio (DataFrame): processed portfolio.
     """
     portfolio[labels.QUOTE] = portfolio.apply(
         lambda x: yf.Ticker(x.name + ".SA").quotes[x.name + ".SA"]["bid"], axis=1
@@ -74,7 +74,7 @@ def profit_and_loss(portfolio):
     """Compute profit and loss and adds a columns to the DataFrame
 
     Args:
-        portfolio : DataFrame
+        portfolio (DataFrame): processed portfolio.
 
     """
     portfolio[labels.PL] = (
@@ -89,7 +89,7 @@ def current_value(portfolio):
     """Compute current value and add column to DataFrame
 
     Args:
-        portfolio : DataFrame
+        portfolio (DataFrame): processed portfolio.
 
     """
     portfolio[labels.CURRENT_VALUE] = portfolio[labels.QUOTE] * portfolio[labels.NET_POS]
