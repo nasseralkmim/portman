@@ -1,4 +1,4 @@
-=portman= is a package to manage your portfolio.
+=portman= is a package to process your trade data.
 
 * Features
 
@@ -34,9 +34,22 @@ date,type,ticker,volume,price,total,vol_adj
 * Use =portman=
 :PROPERTIES:
 :header-args:python: :session demo
+:header-args:shell: :dir examples/
 :END:
 
-Generates a =.csv= file.
+Generates a =.csv= file by calling the =portman.process= module with the trades data,
+
+#+begin_src shell
+python -m portman.process "trade_data.csv"
+cat portfolio.csv
+#+end_src
+
+#+RESULTS:
+: ticker,Net vol.,Avg. price ($),Quote ($),P/L %,Cur. val. ($),Sector
+: ABEV3,83,17.469638554216868,17.2,-1.5434695650974553,1427.6,Consumer Defensive
+: EGIE3,82,34.88292682926829,38.7,10.942525520906175,3173.4,Utilities
+
+Can be used in script form.
 
 #+begin_src python
 import portman.trades

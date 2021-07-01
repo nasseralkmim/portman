@@ -18,4 +18,5 @@ VOL = 'volume'
 ADJUSTED_VOL = 'vol. adj.'      # adjusted volume based on type 
 PURCHASE_PRICE = 'price'
 TOTAL_INVESTED = 'tot. invested'
+FEE = 'fee'
 

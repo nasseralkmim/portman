@@ -25,6 +25,7 @@ def process(trades_file):
             labels.TICKER,
             labels.VOL,
             labels.PURCHASE_PRICE,
+            labels.FEE
         ],
         decimal=",",
         parse_dates=[labels.DATE],
