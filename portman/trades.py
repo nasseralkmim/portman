@@ -1,4 +1,4 @@
-"""Module that process the trades data file"""
+"""Module that process the raw trades data file"""
 import pandas as pd
 from portman import labels
 
@@ -6,10 +6,15 @@ from portman import labels
 def process(trades_file):
     """Process the trade data from trades_file.
 
-    Saves the output to a '.csv' file.
+    Note:
+        Saves the output to a '.csv' file.
+
+    Args:
+        trades_file (str): '.csv' with trade data.
 
     Returns:
-        DataFrame
+        DataFrame: with portfolio data processed.
+
     """
     trades = pd.read_csv(
         trades_file,

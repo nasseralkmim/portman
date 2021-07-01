@@ -1,4 +1,4 @@
-"""Process the trades DataFrame."""
+"""Process the trades DataFrame into a consolidate portfolio."""
 import pandas as pd
 import yahooquery as yf
 from portman import labels
@@ -7,10 +7,11 @@ from portman import labels
 def process(trades):
     """Consolidates trade data into a portfolio DataFrame with current holdings.
 
-    Saves into a file
+    Note:
+        Saves into a '.csv' file.
 
     Args:
-        trades : DataFrame
+        trades (DataFrame): processed trades data.
 
     """
     portfolio = pd.DataFrame()
