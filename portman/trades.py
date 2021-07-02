@@ -12,7 +12,7 @@ def process(trades_file: str) -> pd.DataFrame:
             labels.DATE,
             labels.TYPE,
             labels.TICKER,
-            labels.VOL,
+            labels.SHARES,
             labels.PURCHASE_PRICE,
             labels.FEE
         ],
@@ -24,25 +24,26 @@ def process(trades_file: str) -> pd.DataFrame:
     trades = adjusted_volume(trades)
 
     trades = trades.sort_values(labels.DATE)
-    trades.to_csv("trades.csv", index=False)
+    trades.to_csv(labels.TRADES_FILE, index=False)
     return trades
 
 def total_invested(trades: pd.DataFrame) -> pd.DataFrame:
     """Compute total value invested."""
-    trades[labels.TOTAL_INVESTED] = trades.apply(
-        lambda x: x.price * x.volume
-        if x.type in ["Buy", "Split"]
-        else -x.price * x.volume,
+    trades[labels.TOTAL] = trades.apply(
+        lambda x: x[labels.PURCHASE_PRICE] * x[labels.SHARES]
+        if x[labels.TYPE] in [labels.BUY, labels.SPLIT]
+        else -x[labels.PURCHASE_PRICE] * x[labels.SHARES], # negative sell
         axis=1,
     )
     return trades
 
 def adjusted_volume(trades: pd.DataFrame) -> pd.DataFrame:
-    """Adjusted position volume based on type and add column."""
+    """Adjusted position volume based on type and add column. """
     trades[labels.ADJUSTED_VOL] = trades.apply(
-        lambda x: x.volume
-        if x.type in ["Buy", "Split"]
-        else (-x.volume if x.type in ["Sell"] else 0),
+        lambda x: x[labels.SHARES]
+        if x[labels.TYPE] in [labels.BUY, labels.SPLIT]
+        # make it negative if type is 'sell'
+        else (-x[labels.SHARES] if x[labels.TYPE] in [labels.SELL] else 0),
         axis=1,
     )
     return trades

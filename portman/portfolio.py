@@ -11,7 +11,7 @@ def process(trades: pd.DataFrame) -> pd.DataFrame:
     portfolio = average_purchase_price(trades, portfolio)
     portfolio = current_price(portfolio)
     portfolio = profit_and_loss(portfolio)
-    portfolio = current_value(portfolio)
+    portfolio = market_value(portfolio)
     portfolio = sector(portfolio)
     portfolio.to_csv(labels.PORTFOLIO_FILE)
     return portfolio
@@ -20,7 +20,7 @@ def process(trades: pd.DataFrame) -> pd.DataFrame:
 def net_position(
     trades: pd.DataFrame, portfolio: pd.DataFrame) -> pd.DataFrame:
     """Compute net position from trades."""
-    portfolio[labels.NET_POS] = trades.groupby("ticker")[labels.ADJUSTED_VOL].sum()
+    portfolio[labels.SHARES] = trades.groupby(labels.TICKER)[labels.ADJUSTED_VOL].sum()
     return portfolio
 
 
@@ -29,17 +29,17 @@ def average_purchase_price(
     """Compute average purchase price of an asset and adds new column."""
     # naive, simple, implementation, just sum total and divide by net position
     portfolio[labels.AVG_PRICE] = (
-        trades.groupby("ticker")[labels.TOTAL_INVESTED].sum()
-        / portfolio[labels.NET_POS]
+        trades.groupby("ticker")[labels.TOTAL].sum()
+        / portfolio[labels.SHARES]
     )
     # remove net 0 positions
-    portfolio = portfolio[portfolio[labels.NET_POS] != 0]
+    portfolio = portfolio[portfolio[labels.SHARES] != 0]
     return portfolio
 
 
 def current_price(portfolio: pd.DataFrame) -> pd.DataFrame:
     """Get current price from Yahoo finance and add a column to portfolio."""
-    portfolio[labels.QUOTE] = portfolio.apply(
+    portfolio[labels.MARKET_PRICE] = portfolio.apply(
         lambda x: yf.Ticker(x.name).quotes[x.name]["regularMarketPrice"], axis=1
     )
     return portfolio
@@ -48,17 +48,17 @@ def current_price(portfolio: pd.DataFrame) -> pd.DataFrame:
 def profit_and_loss(portfolio: pd.DataFrame) -> pd.DataFrame:
     """Compute profit and loss and adds a columns to the DataFrame."""
     portfolio[labels.PL] = (
-        (portfolio[labels.QUOTE] - portfolio[labels.AVG_PRICE])
+        (portfolio[labels.MARKET_PRICE] - portfolio[labels.AVG_PRICE])
         / portfolio[labels.AVG_PRICE]
         * 100
     )
     return portfolio
 
 
-def current_value(portfolio: pd.DataFrame) -> pd.DataFrame:
+def market_value(portfolio: pd.DataFrame) -> pd.DataFrame:
     """Compute current value and add column to DataFrame."""
-    portfolio[labels.CURRENT_VALUE] = (
-        portfolio[labels.QUOTE] * portfolio[labels.NET_POS]
+    portfolio[labels.MARKET_VALUE] = (
+        portfolio[labels.MARKET_PRICE] * portfolio[labels.SHARES]
     )
     return portfolio
 
