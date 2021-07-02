@@ -2,13 +2,16 @@
 
 * Features
 
-1. Simple =.csv= input file
-2. Snapshot of portfolio *core* information
-   1. holdings net volume (what do you have?)
-   2. average purchase price (how much did you pay for it?)
-   3. current quote (what is the current price?)
-   4. profit and loss on position (how much I'm gaining or losing?)
-   5. equity distribution by value and industry (how diversified are my holdings?)
+1. Simple =.csv= input file.
+2. Snapshot of portfolio *core* information.
+   1. share holdings (what do you have?).
+   2. average purchase price (how much did you pay for it?).
+   3. current market price (what is the current price?).
+   4. profit and loss on position (how much I'm gaining or losing?).
+3. Dashboard visualization of snapshot.
+   1. asset class distribution (stocks, etf, crypto, reit).
+   2. stocks distribution by sector.
+
 
 * Input
 The input is a simple =.csv= file with your transaction history.
@@ -27,9 +30,13 @@ Generates a =.csv= file by calling the =portman.process= module with the trades 
 
 #+begin_src shell
 python -m portman.process "trade_data.csv"
+cat portfolio.csv
 #+end_src
 
 #+RESULTS:
+: ticker,shares,average price ($),market price ($),P/L %,market value ($),Sector
+: AMZN,20,17.5,3432.97,19516.971428571425,68659.4,Consumer Cyclical
+: GOOG,40,6.25,2527.37,40337.92,101094.79999999999,Communication Services
 
 Can be used in script form.
 
@@ -43,28 +50,27 @@ print(por)
 #+end_src
 
 #+RESULTS:
-:         Net vol.  Avg. price ($)  Quote ($)      P/L %  Cur. val. ($)  \
-: ticker                                                                  
-: ABEV3         83       17.469639      16.91  -3.203492        1403.53   
-: EGIE3         82       34.882927      39.90  14.382604        3271.80   
+:         shares  average price ($)  market price ($)         P/L %  \
+: ticker                                                              
+: AMZN        20              17.50           3432.97  19516.971429   
+: GOOG        40               6.25           2527.37  40337.920000   
 : 
-:                     Sector  
-: ticker                      
-: ABEV3   Consumer Defensive  
-: EGIE3            Utilities  
-
-
-* Concepts
-** Value, quote and price
-
+:         market value ($)                  Sector  
+: ticker                                            
+: AMZN             68659.4       Consumer Cyclical  
+: GOOG            101094.8  Communication Services  
 
 
 * Todo
-1. check how average price was computed (trade.py).
-   1. naive... need to do it correctly
-2. check how import/export from potfolio-performance works.
-   1. csv, good and complete, but it is not as smooth as I expected.
-
+** TODO add multiple currencies.
+1. this will affect the 
+** DONE check how average price was computed (trade.py).
+1. naive... but effective enough.
+2. it makes difference if you trade frequently.
+** DONE check how import/export from potfolio-performance works.
+1. csv, good and complete, but it is not as smooth as I expected.
 * Changelog
 
-1. <2021-06-28 Mon> Moved visualization to a different package, =portvis=.
+1. <2021-07-02 Fri> added back sub-packages for visualization, performance and income. Since there is a strong dependence of the dataframe structure between visualization and consolidation.
+2. <2021-06-28 Mon> Moved visualization to a different package, =portvis=.
+   
