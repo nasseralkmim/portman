@@ -1,3 +1,4 @@
+"""Example to create a processed portfolio"""
 import portman.trades
 import portman.portfolio
 
