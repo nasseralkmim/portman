@@ -13,22 +13,8 @@
 * Input
 The input is a simple =.csv= file with your transaction history.
 
-#+begin_src shell
-cat examples/trades.csv
-#+end_src
-
-#+RESULTS:
 #+begin_example
-date,type,ticker,volume,price,total,vol_adj
-2018-09-17,Buy,EGIE3,40,36.5,1460.0,40
-2018-10-03,Buy,ABEV3,28,18.26,511.28000000000003,28
-2018-10-16,Buy,ABEV3,30,17.29,518.6999999999999,30
-2018-11-07,Buy,ABEV3,25,16.8,420.0,25
-2018-12-12,Split,EGIE3,10,0.0,0.0,10
-2019-03-15,Sell,EGIE3,25,39.0,-975.0,-25
-2020-03-25,Buy,EGIE3,15,38.0,570.0,15
-2020-03-25,Buy,EGIE3,10,37.5,375.0,10
-2020-07-27,Buy,EGIE3,32,44.7,1430.4,32
+date,type,ticker,volume,price,fee
 #+end_example
 
 * Use =portman=
@@ -41,13 +27,9 @@ Generates a =.csv= file by calling the =portman.process= module with the trades 
 
 #+begin_src shell
 python -m portman.process "trade_data.csv"
-cat portfolio.csv
 #+end_src
 
 #+RESULTS:
-: ticker,Net vol.,Avg. price ($),Quote ($),P/L %,Cur. val. ($),Sector
-: ABEV3,83,17.469638554216868,17.2,-1.5434695650974553,1427.6,Consumer Defensive
-: EGIE3,82,34.88292682926829,38.7,10.942525520906175,3173.4,Utilities
 
 Can be used in script form.
 
@@ -79,6 +61,7 @@ print(por)
 
 * Todo
 1. check how average price was computed (trade.py).
+   1. naive... need to do it correctly
 2. check how import/export from potfolio-performance works.
    1. csv, good and complete, but it is not as smooth as I expected.
 

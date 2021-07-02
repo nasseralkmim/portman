@@ -3,19 +3,8 @@ import pandas as pd
 from portman import labels
 
 
-def process(trades_file):
-    """Process the trade data from trades_file.
-
-    Note:
-        Saves the output to a '.csv' file.
-
-    Args:
-        trades_file (str): '.csv' with trade data.
-
-    Returns:
-        DataFrame: with portfolio data processed.
-
-    """
+def process(trades_file: str) -> pd.DataFrame:
+    """Process the trade data from trades_file and save it to a file."""
     trades = pd.read_csv(
         trades_file,
         sep=",",
@@ -27,11 +16,10 @@ def process(trades_file):
             labels.PURCHASE_PRICE,
             labels.FEE
         ],
-        decimal=",",
+        # decimal=",",
         parse_dates=[labels.DATE],
         infer_datetime_format=True,
     )
-
     trades = total_invested(trades)
     trades = adjusted_volume(trades)
 
@@ -39,13 +27,8 @@ def process(trades_file):
     trades.to_csv("trades.csv", index=False)
     return trades
 
-def total_invested(trades):
-    """Compute total value invested
-
-    Args:
-        trades : DataFrame
-    
-    """
+def total_invested(trades: pd.DataFrame) -> pd.DataFrame:
+    """Compute total value invested."""
     trades[labels.TOTAL_INVESTED] = trades.apply(
         lambda x: x.price * x.volume
         if x.type in ["Buy", "Split"]
@@ -54,13 +37,8 @@ def total_invested(trades):
     )
     return trades
 
-def adjusted_volume(trades):
-    """Adjusted position volume based on type and add column
-
-    Args:
-        trades : DataFrame
-    
-    """
+def adjusted_volume(trades: pd.DataFrame) -> pd.DataFrame:
+    """Adjusted position volume based on type and add column."""
     trades[labels.ADJUSTED_VOL] = trades.apply(
         lambda x: x.volume
         if x.type in ["Buy", "Split"]

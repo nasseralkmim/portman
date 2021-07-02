@@ -4,16 +4,8 @@ import yahooquery as yf
 from portman import labels
 
 
-def process(trades):
-    """Consolidates trade data into a portfolio DataFrame with current holdings.
-
-    Note:
-        Saves into a '.csv' file.
-
-    Args:
-        trades (DataFrame): processed trades data.
-
-    """
+def process(trades: pd.DataFrame) -> pd.DataFrame:
+    """Consolidates trade data into a portfolio DataFrame with current holdings."""
     portfolio = pd.DataFrame()
     portfolio = net_position(trades, portfolio)
     portfolio = average_purchase_price(trades, portfolio)
@@ -25,58 +17,36 @@ def process(trades):
     return portfolio
 
 
-def net_position(trades, portfolio):
-    """Compute net position from trades.
-
-    Introduces a new column into the portfolio DataFrame
-
-    Args:
-        trades (DataFrame): processed trades.
-        portfolio (DataFrame): processed portfolio.
-
-    """
+def net_position(
+    trades: pd.DataFrame, portfolio: pd.DataFrame) -> pd.DataFrame:
+    """Compute net position from trades."""
     portfolio[labels.NET_POS] = trades.groupby("ticker")[labels.ADJUSTED_VOL].sum()
     return portfolio
 
 
-
-def average_purchase_price(trades, portfolio):
-    """Compute average purchase price of an asset and adds new column
-
-    Args:
-        trades (DataFrame): processed trades.
-
-    """
-    # naive implementation, just sum total and divide by net position
-    # TODO need to accounts for 
+def average_purchase_price(
+    trades: pd.DataFrame, portfolio: pd.DataFrame) -> pd.DataFrame:
+    """Compute average purchase price of an asset and adds new column."""
+    # naive, simple, implementation, just sum total and divide by net position
     portfolio[labels.AVG_PRICE] = (
-        trades.groupby("ticker")[labels.TOTAL_INVESTED].sum() / portfolio[labels.NET_POS]
+        trades.groupby("ticker")[labels.TOTAL_INVESTED].sum()
+        / portfolio[labels.NET_POS]
     )
     # remove net 0 positions
     portfolio = portfolio[portfolio[labels.NET_POS] != 0]
     return portfolio
 
 
-def current_price(portfolio):
-    """Get current price from Yahoo finance and add a column to portfolio
-
-    Introduces a new column into the portfolio DataFrame
-
-    Args:
-        portfolio (DataFrame): processed portfolio.
-    """
+def current_price(portfolio: pd.DataFrame) -> pd.DataFrame:
+    """Get current price from Yahoo finance and add a column to portfolio."""
     portfolio[labels.QUOTE] = portfolio.apply(
-        lambda x: yf.Ticker(x.name + ".SA").quotes[x.name + ".SA"]["bid"], axis=1
+        lambda x: yf.Ticker(x.name).quotes[x.name]["regularMarketPrice"], axis=1
     )
     return portfolio
 
-def profit_and_loss(portfolio):
-    """Compute profit and loss and adds a columns to the DataFrame
 
-    Args:
-        portfolio (DataFrame): processed portfolio.
-
-    """
+def profit_and_loss(portfolio: pd.DataFrame) -> pd.DataFrame:
+    """Compute profit and loss and adds a columns to the DataFrame."""
     portfolio[labels.PL] = (
         (portfolio[labels.QUOTE] - portfolio[labels.AVG_PRICE])
         / portfolio[labels.AVG_PRICE]
@@ -85,21 +55,18 @@ def profit_and_loss(portfolio):
     return portfolio
 
 
-def current_value(portfolio):
-    """Compute current value and add column to DataFrame
-
-    Args:
-        portfolio (DataFrame): processed portfolio.
-
-    """
-    portfolio[labels.CURRENT_VALUE] = portfolio[labels.QUOTE] * portfolio[labels.NET_POS]
+def current_value(portfolio: pd.DataFrame) -> pd.DataFrame:
+    """Compute current value and add column to DataFrame."""
+    portfolio[labels.CURRENT_VALUE] = (
+        portfolio[labels.QUOTE] * portfolio[labels.NET_POS]
+    )
     return portfolio
 
 
-def sector(portfolio):
+def sector(portfolio: pd.DataFrame) -> pd.DataFrame:
     """Get asset business sector"""
     portfolio["Sector"] = portfolio.apply(
-        lambda x: yf.Ticker(x.name + ".SA").asset_profile[x.name + ".SA"]["sector"],
+        lambda x: yf.Ticker(x.name).asset_profile[x.name]["sector"],
         axis=1,
     )
     return portfolio
