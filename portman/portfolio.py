@@ -44,14 +44,14 @@ class Portfolio:
         return self.summary
 
     def _current_price(self) -> pd.DataFrame:
-        """Get current price from Yahoo finance and add a column to portfolio."""
+        """Get current price from Yahoo finance and add a column to summary."""
         self.summary[self.labels.MARKET_PRICE] = self.summary.apply(
             lambda x: yf.Ticker(x.name).quotes[x.name]["regularMarketPrice"], axis=1
         )
         return self.summary
 
     def _profit_and_loss(self) -> pd.DataFrame:
-        """Compute profit and loss and adds a columns to the DataFrame."""
+        """Compute profit and loss and adds a column to summary."""
         self.summary[self.labels.PL] = (
             (
                 self.summary[self.labels.MARKET_PRICE]
@@ -63,7 +63,7 @@ class Portfolio:
         return self.summary
 
     def _market_value(self) -> pd.DataFrame:
-        """Compute current value and add column to DataFrame."""
+        """Compute current value and add column to summary."""
         self.summary[self.labels.MARKET_VALUE] = (
             self.summary[self.labels.MARKET_PRICE] * self.summary[self.labels.SHARES]
         )
