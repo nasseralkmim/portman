@@ -17,7 +17,7 @@
 The input is a simple =.csv= file with your transaction history.
 
 #+begin_example
-date,type,ticker,volume,price,fee
+date,type,ticker,shares,price,fee
 #+end_example
 
 * Use =portman=
