@@ -26,8 +26,7 @@ def net_position(trades: pd.DataFrame, portfolio: pd.DataFrame) -> pd.DataFrame:
 
 
 def average_purchase_price(
-    trades: pd.DataFrame, portfolio: pd.DataFrame
-) -> pd.DataFrame:
+    trades: pd.DataFrame, portfolio: pd.DataFrame) -> pd.DataFrame:
     """Compute average purchase price of an asset and adds new column."""
     # naive, simple, implementation, just sum total and divide by net position
     portfolio[labels.AVG_PRICE] = (
@@ -66,7 +65,7 @@ def market_value(portfolio: pd.DataFrame) -> pd.DataFrame:
 
 def sector(portfolio: pd.DataFrame) -> pd.DataFrame:
     """Get asset business sector"""
-    portfolio["Sector"] = portfolio.apply(
+    portfolio[labels.SECTOR] = portfolio.apply(
         lambda x: yf.Ticker(x.name).asset_profile[x.name]["sector"],
         axis=1,
     )
