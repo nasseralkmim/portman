@@ -5,68 +5,73 @@ from portman import labels
 from portman.trades import adjusted_volume
 
 
-def process(trades: pd.DataFrame) -> pd.DataFrame:
-    """Consolidates trade data into a portfolio DataFrame with current holdings."""
-    portfolio = pd.DataFrame()
-    portfolio = net_position(trades, portfolio)
-    portfolio = average_purchase_price(trades, portfolio)
-    portfolio = current_price(portfolio)
-    portfolio = profit_and_loss(portfolio)
-    portfolio = market_value(portfolio)
-    portfolio = sector(portfolio)
-    portfolio.to_csv(labels.PORTFOLIO_FILE)
-    return portfolio
+class Portfolio:
+    """Creates portfolio object"""
 
+    def __init__(self, trades: pd.DataFrame):
+        self.labels = labels
+        self.summary = pd.DataFrame()
+        self.trades = trades
+        self.summary = self._net_position()
+        self.summary = self._average_purchase_price()
+        self.summary = self._average_purchase_price()
+        self.summary = self._average_purchase_price()
+        self.summary = self._current_price()
+        self.summary = self._profit_and_loss()
+        self.summary = self._market_value()
+        self.summary = self._sector()
+        self.summary.to_csv(labels.PORTFOLIO_FILE)
 
-def net_position(trades: pd.DataFrame, portfolio: pd.DataFrame) -> pd.DataFrame:
-    """Compute net position from trades."""
-    trades = adjusted_volume(trades)
-    portfolio[labels.SHARES] = trades.groupby(labels.TICKER)[labels.ADJUSTED_VOL].sum()
-    return portfolio
+    def _net_position(self) -> pd.DataFrame:
+        """Compute net position from trades."""
+        self.trades = adjusted_volume(self.trades)
+        self.summary[self.labels.SHARES] = self.trades.groupby(self.labels.TICKER)[
+            self.labels.ADJUSTED_VOL
+        ].sum()
+        return self.summary
 
+    def _average_purchase_price(self) -> pd.DataFrame:
+        """Compute average purchase price of an asset and adds new column."""
+        # naive, simple, implementation, just sum total and divide by net position
+        self.summary[self.labels.AVG_PRICE] = (
+            self.trades.groupby("ticker")[self.labels.TOTAL].sum()
+            / self.summary[self.labels.SHARES]
+        )
+        # remove net 0 positions
+        self.summary = self.summary[self.summary[self.labels.SHARES] != 0]
+        return self.summary
 
-def average_purchase_price(
-    trades: pd.DataFrame, portfolio: pd.DataFrame) -> pd.DataFrame:
-    """Compute average purchase price of an asset and adds new column."""
-    # naive, simple, implementation, just sum total and divide by net position
-    portfolio[labels.AVG_PRICE] = (
-        trades.groupby("ticker")[labels.TOTAL].sum() / portfolio[labels.SHARES]
-    )
-    # remove net 0 positions
-    portfolio = portfolio[portfolio[labels.SHARES] != 0]
-    return portfolio
+    def _current_price(self) -> pd.DataFrame:
+        """Get current price from Yahoo finance and add a column to portfolio."""
+        self.summary[self.labels.MARKET_PRICE] = self.summary.apply(
+            lambda x: yf.Ticker(x.name).quotes[x.name]["regularMarketPrice"], axis=1
+        )
+        return self.summary
 
+    def _profit_and_loss(self) -> pd.DataFrame:
+        """Compute profit and loss and adds a columns to the DataFrame."""
+        self.summary[self.labels.PL] = (
+            (
+                self.summary[self.labels.MARKET_PRICE]
+                - self.summary[self.labels.AVG_PRICE]
+            )
+            / self.summary[self.labels.AVG_PRICE]
+            * 100
+        )
+        return self.summary
 
-def current_price(portfolio: pd.DataFrame) -> pd.DataFrame:
-    """Get current price from Yahoo finance and add a column to portfolio."""
-    portfolio[labels.MARKET_PRICE] = portfolio.apply(
-        lambda x: yf.Ticker(x.name).quotes[x.name]["regularMarketPrice"], axis=1
-    )
-    return portfolio
+    def _market_value(self) -> pd.DataFrame:
+        """Compute current value and add column to DataFrame."""
+        self.summary[self.labels.MARKET_VALUE] = (
+            self.summary[self.labels.MARKET_PRICE] * self.summary[self.labels.SHARES]
+        )
+        return self.summary
 
+    def _sector(self) -> pd.DataFrame:
+        """Get asset business sector"""
+        self.summary[self.labels.SECTOR] = self.summary.apply(
+            lambda x: yf.Ticker(x.name).asset_profile[x.name]["sector"],
+            axis=1,
+        )
+        return self.summary
 
-def profit_and_loss(portfolio: pd.DataFrame) -> pd.DataFrame:
-    """Compute profit and loss and adds a columns to the DataFrame."""
-    portfolio[labels.PL] = (
-        (portfolio[labels.MARKET_PRICE] - portfolio[labels.AVG_PRICE])
-        / portfolio[labels.AVG_PRICE]
-        * 100
-    )
-    return portfolio
-
-
-def market_value(portfolio: pd.DataFrame) -> pd.DataFrame:
-    """Compute current value and add column to DataFrame."""
-    portfolio[labels.MARKET_VALUE] = (
-        portfolio[labels.MARKET_PRICE] * portfolio[labels.SHARES]
-    )
-    return portfolio
-
-
-def sector(portfolio: pd.DataFrame) -> pd.DataFrame:
-    """Get asset business sector"""
-    portfolio[labels.SECTOR] = portfolio.apply(
-        lambda x: yf.Ticker(x.name).asset_profile[x.name]["sector"],
-        axis=1,
-    )
-    return portfolio
