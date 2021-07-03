@@ -20,7 +20,7 @@ class Portfolio:
         self.summary = self._profit_and_loss()
         self.summary = self._market_value()
         self.summary = self._sector()
-        self.summary.to_csv(labels.PORTFOLIO_FILE)
+        self.summary.to_csv(self.labels.PORTFOLIO_FILE)
 
     def _net_position(self) -> pd.DataFrame:
         """Compute net position from trades."""
