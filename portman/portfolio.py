@@ -8,7 +8,9 @@ from portman.trades import adjusted_volume
 class Portfolio:
     """Creates portfolio object"""
 
-    def __init__(self, trades: pd.DataFrame):
+    def __init__(self,
+                 trades: pd.DataFrame,
+                 portfolio_file: str = labels.PORTFOLIO_FILE):
         self.labels = labels
         self.summary = pd.DataFrame()
         self.trades = trades
@@ -20,7 +22,7 @@ class Portfolio:
         self.summary = self._profit_and_loss()
         self.summary = self._market_value()
         self.summary = self._sector()
-        self.summary.to_csv(self.labels.PORTFOLIO_FILE)
+        self.summary.to_csv(portfolio_file)
 
     def _net_position(self) -> pd.DataFrame:
         """Compute net position from trades."""
