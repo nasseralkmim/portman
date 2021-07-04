@@ -6,18 +6,28 @@ from portman.labels import Labels
 
 
 class Trades:
-    """Process the trade data."""
+    """Process the trade data.
+
+    Args:
+        dayfirst: date format starts with day by default.
+
+    """
 
     def __init__(
-        self, trades_file: str, columns: list[str], date_column: str, labels: Labels
+        self,
+        trades_file: str,
+        columns: list[str],
+        date_column: str,
+        labels: Labels,
+        dayfirst: bool = True,
     ):
         self.columns = columns
         self.date_column = date_column
-        self.labels = labels    # aggregation of Labels object
-        self.history = self._parse_trades_file(trades_file)
+        self.labels = labels  # aggregation of Labels object
+        self.history = self._parse_trades_file(trades_file, dayfirst)
         self.history = self._transation_total()
 
-    def _parse_trades_file(self, trades_file: str) -> pd.DataFrame:
+    def _parse_trades_file(self, trades_file: str, dayfirst: bool) -> pd.DataFrame:
         """Parse trades file into a data frame."""
         trades = pd.read_csv(
             trades_file,
@@ -25,6 +35,7 @@ class Trades:
             names=self.columns,
             parse_dates=[self.date_column],
             infer_datetime_format=True,
+            dayfirst=dayfirst
         )
         return trades
 

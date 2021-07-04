@@ -1,3 +1,4 @@
 black
 black-machiato
+pytest
 -e .
