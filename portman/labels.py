@@ -1,26 +1,26 @@
-"""Labels for DataFrames
+"""Define string labels for DataFrames columns and for plotting."""
 
-Centralize labels for columns in data frames
-"""
 
-AVG_PRICE = 'average price ($)'           # average purchase price of an asset
-PL = 'P/L %'                    # profit and loss in a position
-MARKET_PRICE = 'market price ($)'             # current price
-MARKET_VALUE = 'market value ($)' # current value of a position
-SECTOR = 'sector'               # asset business sector
+class Labels:
+    """Define labels."""
+    def __init__(self):
+        self.AVG_PRICE = "average price ($)"  # average purchase price of an asset
+        self.PL = "P/L %"  # profit and loss in a position
+        self.MARKET_PRICE = "market price ($)"  # current price
+        self.MARKET_VALUE = "market value ($)"  # current value of a position
+        self.SECTOR = "sector"  # asset business sector
+        self.DATE = "date"
+        self.TYPE = "type"  # buy, sell, split from the trade data
+        self.TICKER = "ticker"
+        self.SHARES = "shares"
+        self.ADJUSTED_VOL = "volume adjusted"  # adjusted volume based on type
+        self.PURCHASE_PRICE = "purchase price"
+        self.TOTAL = "total"
+        self.FEE = "fee"
+        self.BUY = "Buy"
+        self.SELL = "Sell"
+        self.SPLIT = "Split"
 
-PORTFOLIO_FILE = 'portfolio.csv'
-TRADES_FILE = 'trades.csv'      # processed trades files
-
-DATE = 'date'
-TYPE = 'type'                   # buy, sell, split from the trade data
-TICKER = 'ticker'
-SHARES = 'shares'
-ADJUSTED_VOL = 'volume adjusted'      # adjusted volume based on type 
-PURCHASE_PRICE = 'purchase price'
-TOTAL = 'total'
-FEE = 'fee'
-
-BUY = 'Buy'
-SELL = 'Sell'
-SPLIT = 'Split'
+    def set_label(self, **kwarg: str) -> None:
+        """Change or add new label."""
+        self.__dict__.update(kwarg)
