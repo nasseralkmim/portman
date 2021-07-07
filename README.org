@@ -9,7 +9,7 @@
    3. current market price (what is the current price?).
    4. profit and loss on position (how much I'm gaining or losing?).
 3. Dashboard visualization of snapshot.
-   1. asset class distribution (stocks, etf, crypto, reit).
+   1. asset class distribution (stocks, etf, reit).
    2. stocks distribution by sector.
 
 
