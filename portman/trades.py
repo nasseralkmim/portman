@@ -16,14 +16,29 @@ class Trades:
     def __init__(
         self,
         trades_file: str,
-        columns: list[str],
-        date_column: str,
         labels: Labels,
+        columns: list[str] = None,
+        date_column: str = None,
         dayfirst: bool = True,
     ):
-        self.columns = columns
-        self.date_column = date_column
+
         self.labels = labels  # aggregation of Labels object
+
+        # default columns
+        if columns is None:
+            self.columns = [self.labels.DATE,
+                            self.labels.TYPE,
+                            self.labels.TICKER,
+                            self.labels.SHARES,
+                            self.labels.PURCHASE_PRICE,
+                            self.labels.FEE]
+        else:
+            self.columns = columns
+        if date_column is None:
+            self.date_column = self.labels.DATE
+        else:
+            self.date_column = date_column
+        
         self.history = self._parse_trades_file(trades_file, dayfirst)
         self.history = self._transation_total()
 
@@ -35,7 +50,7 @@ class Trades:
             names=self.columns,
             parse_dates=[self.date_column],
             infer_datetime_format=True,
-            dayfirst=dayfirst
+            dayfirst=dayfirst,
         )
         return trades
 
