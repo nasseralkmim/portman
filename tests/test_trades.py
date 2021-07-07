@@ -1,5 +1,4 @@
 import os
-import pytest
 import pandas as pd
 from pandas._testing import assert_frame_equal
 import portman.trades
@@ -8,8 +7,7 @@ import portman.labels
 
 def test_trades():
     labels = portman.labels.Labels()
-    file_name = os.path.join(os.path.dirname(__file__),
-                         'test_trades.csv')
+    file_name = os.path.join(os.path.dirname(__file__), "test_trades.csv")
     trades = portman.trades.Trades(
         file_name,
         columns=[
@@ -23,15 +21,17 @@ def test_trades():
         date_column=labels.DATE,
         labels=labels,
     )
+
+    # expected results
     df = pd.DataFrame(
         {
             labels.DATE: pd.to_datetime(["01-01-2020", "03-01-2020"], dayfirst=True),
-            labels.TYPE: ["Buy", "Sell"],
-            labels.TICKER: ["GOOG", "GOOG"],
-            labels.SHARES: [40, 25],
-            labels.PURCHASE_PRICE: [20., 40.],
-            labels.FEE: [0, 0],
-            labels.TOTAL: [800., -1000.]
+            labels.TYPE: ["Buy", "Sell"], # from file
+            labels.TICKER: ["GOOG", "GOOG"], # from file
+            labels.SHARES: [40, 25],         # from file
+            labels.PURCHASE_PRICE: [20.0, 40.0], # from file
+            labels.FEE: [0, 0],                  # from file
+            labels.TOTAL: [800.0, -1000.0],      # computed
         }
     )
     assert_frame_equal(df, trades.history)
