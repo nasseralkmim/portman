@@ -22,5 +22,10 @@ class Labels:
     SPLIT: str = "Split"
 
     def set_label(self, **kwarg: str) -> None:
-        """Change or add new label."""
+        """Change or add new label.
+
+        Uses the `key = argument` to set a new attribute with the key and its
+        value with the argument.
+       
+        """
         self.__dict__.update(kwarg)
