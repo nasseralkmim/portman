@@ -10,7 +10,8 @@ from portman.trades import Trades
 class Portfolio:
     """Creates portfolio object."""
 
-    def __init__(self, trades: Trades, portfolio_file: str = "portfolio.csv"):
+    def __init__(self, trades: Trades,
+                 portfolio_file: str = "portfolio.csv") -> None:
         self.labels = trades.labels  # aggregation of Labels object
 
         self.trades = trades  # aggregation of Trades object
