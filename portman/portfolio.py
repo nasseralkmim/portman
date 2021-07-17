@@ -64,9 +64,16 @@ class Portfolio:
 
     def _get_current_price(self) -> pd.DataFrame:
         """Get current price from Yahoo finance."""
+        def yahoo_market_price(x):
+            try:
+                return yf.Ticker(x.name).quotes[x.name]["regularMarketPrice"]
+            except (KeyError, TypeError):
+                print(f'Can not find {x.name} in Yahoo finance, check the ticker!')
+
         market_price = self.portfolio.apply(
-            lambda x: yf.Ticker(x.name).quotes[x.name]["regularMarketPrice"], axis=1
+            lambda x: yahoo_market_price(x), axis=1
         )
+            
         return market_price
 
     def _get_sector(self) -> pd.DataFrame:
