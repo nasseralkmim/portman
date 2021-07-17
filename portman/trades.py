@@ -12,6 +12,7 @@ class Trades:
         dayfirst: date format starts with day by default.
         columns: list of labels to use as columns names in the dataframe.
             if `None` assume that the `trades_file` is in a specific order.
+            
         dayfirst: date format starts with day or month.
 
     """
@@ -19,24 +20,16 @@ class Trades:
     def __init__(
         self,
         trades_file: str,
-        labels: Labels,
         columns: list[str] = None,
         date_column: str = None,
         dayfirst: bool = True,
-    ):
+    ) -> None:
 
-        self.labels = labels  # aggregation of Labels object
+        self.labels = Labels()  # composition of Labels
 
-        # default columns
-        if columns is None:
-            self.columns = [self.labels.DATE,
-                            self.labels.TYPE,
-                            self.labels.TICKER,
-                            self.labels.SHARES,
-                            self.labels.PURCHASE_PRICE,
-                            self.labels.FEE]
-        else:
-            self.columns = columns
+        self.columns = self._set_columns(columns)
+
+        # label of the column with dates
         if date_column is None:
             self.date_column = self.labels.DATE
         else:
@@ -67,6 +60,21 @@ class Trades:
             axis=1,
         )
         return transaction_total
+
+    def _set_columns(self, columns: list[str] = None) -> list[str]:
+        """Set columns labels."""
+        if columns is None:
+            col = [
+                self.labels.DATE,
+                self.labels.TYPE,
+                self.labels.TICKER,
+                self.labels.SHARES,
+                self.labels.PURCHASE_PRICE,
+                self.labels.FEE,
+            ]
+        else:
+            col = columns
+        return col
 
     def adjusted_volume(self) -> pd.DataFrame:
         """Adjusted position volume based on type and add column.
