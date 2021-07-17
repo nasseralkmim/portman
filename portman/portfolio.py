@@ -12,8 +12,6 @@ class Portfolio:
         self.labels = trades.labels  # aggregation of Labels object
 
         self.trades = trades  # aggregation of Trades object
-        # adjust volume based on type
-        self.trades.history = self.trades.adjusted_volume()
 
         self.portfolio = pd.DataFrame()
         self.portfolio[self.labels.SHARES] = self._net_shares()
@@ -28,6 +26,8 @@ class Portfolio:
 
     def _net_shares(self) -> pd.DataFrame:
         """Computes net position from trades."""
+        # adjust volume based on type
+        self.trades.history = self.trades.adjusted_volume()
         net_shares = self.trades.history.groupby(
             self.labels.TICKER
         )[self.labels.ADJUSTED_VOL].sum()
