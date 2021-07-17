@@ -1,5 +1,7 @@
 """Process the trades DataFrame into a consolidate portfolio."""
+import warnings
 import pandas as pd
+import numpy as np
 import yahooquery as yf
 
 from portman.trades import Trades
@@ -22,15 +24,16 @@ class Portfolio:
         self.portfolio[self.labels.PL] = self._compute_profit_and_loss()
         self.portfolio[self.labels.MARKET_VALUE] = self._compute_market_value()
         self.portfolio[self.labels.SECTOR] = self._get_sector()
+        self.portfolio[self.labels.NAME] = self._get_long_name()
         self.portfolio.to_csv(portfolio_file)
 
     def _compute_net_shares(self) -> pd.DataFrame:
         """Computes net position from trades."""
         # adjust volume based on type
         self.trades.history = self.trades.adjusted_volume()
-        net_shares = self.trades.history.groupby(
-            self.labels.TICKER
-        )[self.labels.ADJUSTED_VOL].sum()
+        net_shares = self.trades.history.groupby(self.labels.TICKER)[
+            self.labels.ADJUSTED_VOL
+        ].sum()
         return net_shares
 
     def _compute_average_purchase_price(self) -> pd.DataFrame:
@@ -52,7 +55,7 @@ class Portfolio:
             / self.portfolio[self.labels.AVG_PRICE]
             * 100
         )
-        return profit_loss 
+        return profit_loss
 
     def _compute_market_value(self) -> pd.DataFrame:
         """Compute current value from number of shares and market price."""
@@ -64,22 +67,46 @@ class Portfolio:
 
     def _get_current_price(self) -> pd.DataFrame:
         """Get current price from Yahoo finance."""
+
         def yahoo_market_price(x):
             try:
                 return yf.Ticker(x.name).quotes[x.name]["regularMarketPrice"]
             except (KeyError, TypeError):
-                print(f'Can not find {x.name} in Yahoo finance, check the ticker!')
+                warnings.warn(
+                    f"Can not find {x.name} in Yahoo finance, check the ticker!"
+                )
+                return np.nan
 
-        market_price = self.portfolio.apply(
-            lambda x: yahoo_market_price(x), axis=1
-        )
-            
+        market_price = self.portfolio.apply(lambda x: yahoo_market_price(x), axis=1)
+
         return market_price
 
     def _get_sector(self) -> pd.DataFrame:
-        """Get assets business sector."""
+        """Get assets business sector from Yahoo finance."""
+
+        def yahoo_sector(x):
+            try:
+                return yf.Ticker(x.name).asset_profile[x.name]["sector"]
+            except (KeyError, TypeError):
+                return np.nan
+
         sector = self.portfolio.apply(
-            lambda x: yf.Ticker(x.name).asset_profile[x.name]["sector"],
+            lambda x: yahoo_sector(x),
             axis=1,
         )
         return sector
+
+    def _get_long_name(self) -> pd.DataFrame:
+        """Get long name of security from Yahoo finance."""
+
+        def yahoo_long_name(x):
+            try:
+                return yf.Ticker(x.name).quotes[x.name]["longName"]
+            except (KeyError, TypeError):
+                return np.nan
+
+        long_name = self.portfolio.apply(
+            lambda x: yahoo_long_name(x),
+            axis=1,
+        )
+        return long_name
