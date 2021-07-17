@@ -1,5 +1,5 @@
 """Encapsulates trade data from input file """
-from __future__ import annotations  # allows type hint "list[str]"
+from __future__ import annotations  # allows type hint list[str], dict[str, str]
 
 import pandas as pd
 from portman.labels import Labels
@@ -10,6 +10,9 @@ class Trades:
 
     Args:
         dayfirst: date format starts with day by default.
+        columns: list of labels to use as columns names in the dataframe.
+            if `None` assume that the `trades_file` is in a specific order.
+        dayfirst: date format starts with day or month.
 
     """
 
@@ -38,11 +41,11 @@ class Trades:
             self.date_column = self.labels.DATE
         else:
             self.date_column = date_column
-        
-        self.history = self._parse_trades_file(trades_file, dayfirst)
-        self.history = self._transation_total()
 
-    def _parse_trades_file(self, trades_file: str, dayfirst: bool) -> pd.DataFrame:
+        self.history = self._get_trade_history(trades_file, dayfirst)
+        self.history[self.labels.TOTAL] = self._set_transaction_total()
+
+    def _get_trade_history(self, trades_file: str, dayfirst: bool) -> pd.DataFrame:
         """Parse trades file into a data frame."""
         trades = pd.read_csv(
             trades_file,
@@ -54,16 +57,16 @@ class Trades:
         )
         return trades
 
-    def _transation_total(self) -> pd.DataFrame:
-        """Compute total transaction value."""
-        self.history[self.labels.TOTAL] = self.history.apply(
+    def _set_transaction_total(self) -> pd.DataFrame:
+        """Compute total transaction value into a new DF column."""
+        transaction_total = self.history.apply(
             lambda x: x[self.labels.PURCHASE_PRICE] * x[self.labels.SHARES]
             if x[self.labels.TYPE] in [self.labels.BUY, self.labels.SPLIT]
             else -x[self.labels.PURCHASE_PRICE]
             * x[self.labels.SHARES],  # negative sell
             axis=1,
         )
-        return self.history
+        return transaction_total
 
     def adjusted_volume(self) -> pd.DataFrame:
         """Adjusted position volume based on type and add column.
