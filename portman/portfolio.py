@@ -25,6 +25,7 @@ class Portfolio:
         self.portfolio[self.labels.MARKET_VALUE] = self._compute_market_value()
         self.portfolio[self.labels.SECTOR] = self._get_sector()
         self.portfolio[self.labels.NAME] = self._get_long_name()
+        self.portfolio[self.labels.CURRENCY] = self._get_currency()
         self.portfolio.to_csv(portfolio_file)
 
     def _compute_net_shares(self) -> pd.DataFrame:
@@ -92,8 +93,7 @@ class Portfolio:
 
         sector = self.portfolio.apply(
             lambda x: yahoo_sector(x),
-            axis=1,
-        )
+            axis=1)
         return sector
 
     def _get_long_name(self) -> pd.DataFrame:
@@ -107,6 +107,20 @@ class Portfolio:
 
         long_name = self.portfolio.apply(
             lambda x: yahoo_long_name(x),
-            axis=1,
-        )
+            axis=1)
         return long_name
+
+    def _get_currency(self) -> pd.DataFrame:
+        """Get currency of security from Yahoo finance."""
+
+        def yahoo_currency(x):
+            try:
+                return yf.Ticker(x.name).quotes[x.name]["currency"]
+            except (KeyError, TypeError):
+                return np.nan
+
+        currency = self.portfolio.apply(
+            lambda x: yahoo_currency(x),
+            axis=1)
+                
+        return currency

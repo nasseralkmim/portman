@@ -21,6 +21,7 @@ class Labels:
     SELL: str = "Sell"
     SPLIT: str = "Split"
     NAME: str = 'name'
+    CURRENCY: str = 'currency'
 
     def set_label(self, **kwarg: str) -> None:
         """Change or add new label.
