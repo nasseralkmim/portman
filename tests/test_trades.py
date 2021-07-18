@@ -22,7 +22,7 @@ trades = portman.trades.Trades(
 
 
 def test_column_labels():
-    assert list(trades.history.columns.values) == [
+    assert list(trades.history.columns) == [
         labels.DATE,
         labels.TYPE,
         labels.TICKER,

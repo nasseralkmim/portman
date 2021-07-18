@@ -4,21 +4,17 @@ import matplotlib
 import matplotlib.pyplot as plt
 import plotly.express as px
 
+from portman.labels import Labels
+
 matplotlib.style.use("ggplot")
 pd.options.display.float_format = "{:,.2f}".format
 
 
-def allocation(portfolio_file: str, labels):
-    """Plot allocation of the portfolio in a pie chart with matplotlib
+labels = Labels()       # default labels
 
-    Allocation of portfolio based on value and sector.
+def allocation(portfolio_file: str) -> plt.Figure:
+    """Plot allocation of the portfolio in a pie chart with matplotlib """
 
-    Args:
-        portfolio_file (str): file name with portfolio data.
-        labels (module 'portman.labels'): contains the labels for the
-            columns in portfolio file.
-
-    """
     fig, ax = plt.subplots(nrows=1, ncols=2)
     portfolio = pd.read_csv(portfolio_file, index_col=labels.TICKER)
     portfolio[labels.MARKET_VALUE].plot(
@@ -41,7 +37,7 @@ def allocation(portfolio_file: str, labels):
     return fig
 
 
-def summary(portfolio_file, labels):
+def summary(portfolio_file: str) -> plt.Figure:
     """Plot portolio summary with P/L distribution with matplotlib"""
     fig, ax = plt.subplots()
     portfolio = pd.read_csv(portfolio_file, index_col=labels.TICKER).round(2)
@@ -51,21 +47,27 @@ def summary(portfolio_file, labels):
     )
     pd.plotting.table(
         ax,
-        portfolio[[labels.SHARES, labels.AVG_PRICE, labels.QUOTE, labels.PL]],
+        portfolio[[labels.SHARES,
+                   labels.AVG_PRICE,
+                   labels.MARKET_PRICE,
+                   labels.PL]],
     )
     return fig
 
 
-def allocation_sunburst(portfolio_file: str, labels):
+def allocation_sunburst(portfolio_file: str) -> plt.Figure:
     """Plot allocation with sector in a "sunburst" graph with plotly"""
     portfolio = pd.read_csv(portfolio_file)
     fig = px.sunburst(
-        portfolio, path=[labels.SECTOR, labels.TICKER], values=labels.MARKET_VALUE
+        portfolio,
+        path=[labels.SECTOR,
+              labels.TICKER],
+        values=labels.MARKET_VALUE
     )
     return fig
 
 
-def profit_loss_asset(portfolio_file: str, labels):
+def profit_loss_asset(portfolio_file: str) -> plt.Figure:
     """Plot P/L per asset as bar chart with plotly"""
     portfolio = pd.read_csv(portfolio_file)
     fig = px.bar(portfolio, x=labels.TICKER, y=labels.PL)

@@ -12,6 +12,12 @@
    1. asset class distribution (stocks, etf, reit).
    2. stocks distribution by sector.
 
+* Workflow
+
+1. Every trade is recorded in a =.csv= file.
+   1. you can have multiple =.csv= for you own organizational purpose, I use one for each asset class or to separate currencies.
+2. If the input is the default format, you can just run as a program =python -m portman.process <file or list of data files>=
+      
 
 * Input
 The input is a simple =.csv= file with your transaction history.
@@ -25,7 +31,7 @@ date,type,ticker,shares,price,fee
 :header-args:python: :session demo
 :header-args:shell: :dir examples/
 :END:
-
+** As a /program/ that acts on an input file
 Generates a =.csv= file by calling the =portman.process= module with the trades data,
 
 #+begin_src shell
@@ -38,6 +44,7 @@ cat portfolio.csv
 : AMZN,20,17.5,3432.97,19516.971428571425,68659.4,Consumer Cyclical
 : GOOG,40,6.25,2527.37,40337.92,101094.79999999999,Communication Services
 
+** As a /library/ in a script
 Can be used in script form.
 
 #+begin_src python
@@ -62,8 +69,18 @@ print(por)
 
 
 * Todo
-** TODO add multiple currencies.
-1. this will affect the 
+** TODO add multiple trades sources
+
+1. trade source will _define an asset class_
+
+
+** DONE add multiple currencies, use yahoo
+** DONE use sensible defaults in trade object creation.
+1. sensible defaults reduce burden of knowledge about the class needs.
+2. keep flexible in case need to add new columns.
+** DONE change interface to avoid object creation outside.
+1. instead of creating a labels object and passing a instance, it is better to create the object inside the owner class.
+   1. portfolio object own trades and labels.
 ** DONE check how average price was computed (trade.py).
 1. naive... but effective enough.
 2. it makes difference if you trade frequently.

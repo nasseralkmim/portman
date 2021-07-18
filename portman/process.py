@@ -10,9 +10,11 @@ import argparse
 import portman.portfolio
 import portman.trades
 
+# TODO add multiple "trade_file" with asset class
 parser = argparse.ArgumentParser(description='Get trades .csv data')
 parser.add_argument('trades')
 args = parser.parse_args()
 trades_file = args.trades
-trades = portman.trades.process(trades_file)
-portman.portfolio.process(trades)
+# TODO changed to class.
+# trades = portman.trades.process(trades_file)
+# portman.portfolio.process(trades)
