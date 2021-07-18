@@ -75,7 +75,7 @@ class Portfolio:
                 return yf.Ticker(x.name).quotes[x.name]["regularMarketPrice"]
             except (KeyError, TypeError):
                 warnings.warn(
-                    f"Can not find {x.name} in Yahoo finance, check the ticker!"
+                    f"Quote not found for ticker symbol: {x.name}"
                 )
                 return np.nan
 
