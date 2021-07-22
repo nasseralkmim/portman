@@ -2,7 +2,7 @@
 
 
 Example:
-        $python -m portman.process "trades_data.py"
+        $python -m portman.process "trades_file(s).csv"
 
 """
 import argparse
