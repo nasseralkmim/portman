@@ -105,4 +105,6 @@ ENV/
 /jupyter/
 # example csv file
 *.csv
-!trade_data.csv
+!trades.csv
+!etf.csv
+!stocks.csv
