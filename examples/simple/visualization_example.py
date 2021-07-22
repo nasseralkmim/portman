@@ -1,7 +1,7 @@
 import matplotlib.pyplot  as plt
 import portman.portvis.portfolio
 
-portfolio_file = 'portfolio_trades.csv'
+portfolio_file = 'portfolio.csv'
 portman.portvis.portfolio.allocation(portfolio_file)
 portman.portvis.portfolio.summary(portfolio_file)
 

@@ -1,4 +1,6 @@
-"""Process the trades DataFrame into a consolidate portfolio."""
+"""Process the trades DataFrame into a consolidated portfolio."""
+from __future__ import annotations
+from typing import Union
 import warnings
 import pandas as pd
 import numpy as np
@@ -10,98 +12,108 @@ from portman.trades import Trades
 class Portfolio:
     """Creates portfolio object."""
 
-    def __init__(self, trades: Trades,
-                 portfolio_file: str = None) -> None:
-        self.labels = trades.labels  # aggregation of Labels object
+    def __init__(
+        self, trades: Union[Trades, list[Trades]], portfolio_file: str = None
+    ) -> None:
 
-        self.trades = trades  # aggregation of Trades object
+        self.consolidated_trades = []
+        if isinstance(trades, list):
+            for t in trades:
+                self.consolidated_trades.append(self._consolidate_trades(t))
+        else:
+            self.consolidated_trades.append(self._consolidate_trades(trades))
 
-        self.summary = pd.DataFrame()
-        self.summary[self.labels.SHARES] = self._compute_net_shares()
-        self.summary[self.labels.AVG_PRICE] = self._compute_average_purchase_price()
-        # remove net 0 positions
-        self.summary = self.summary[self.summary[self.labels.SHARES] != 0]
-        self.summary[self.labels.MARKET_PRICE] = self._get_current_price()
-        self.summary[self.labels.PL] = self._compute_profit_and_loss()
-        self.summary[self.labels.MARKET_VALUE] = self._compute_market_value()
-        self.summary[self.labels.SECTOR] = self._get_sector()
-        self.summary[self.labels.NAME] = self._get_long_name()
-        self.summary[self.labels.CURRENCY] = self._get_currency()
-        self.summary[self.labels.ASSET_CLASS] = self.trades.asset_class
+        self.summary = pd.concat(self.consolidated_trades)
 
         if portfolio_file is None:
-            portfolio_file = f'portfolio_{trades.trades_file}' 
+            portfolio_file = f"portfolio.csv"
         self.summary.to_csv(portfolio_file)
 
-    def _compute_net_shares(self) -> pd.DataFrame:
+    def _consolidate_trades(self, trades: Trades) -> pd.DataFrame:
+        """Consolidade the trades."""
+        summary = pd.DataFrame()
+        summary[trades.labels.SHARES] = self._compute_net_shares(trades)
+        summary[trades.labels.AVG_PRICE] = self._compute_average_price(trades, summary)
+        # remove net 0 positions
+        summary = summary[summary[trades.labels.SHARES] != 0]
+        summary[trades.labels.MARKET_PRICE] = self._get_current_price(summary)
+        summary[trades.labels.PL] = self._compute_profit_and_loss(trades, summary)
+        summary[trades.labels.MARKET_VALUE] = self._compute_market_value(
+            trades, summary
+        )
+        summary[trades.labels.SECTOR] = self._get_sector(summary)
+        summary[trades.labels.NAME] = self._get_long_name(summary)
+        summary[trades.labels.CURRENCY] = self._get_currency(summary)
+        summary[trades.labels.ASSET_CLASS] = self._get_asset_type(summary)
+        return summary
+
+    def _compute_net_shares(self, trades: Trades) -> pd.DataFrame:
         """Computes net position from trades."""
         # adjust volume based on type
-        self.trades.history = self.trades.adjusted_volume()
-        net_shares = self.trades.history.groupby(self.labels.TICKER)[
-            self.labels.ADJUSTED_VOL
+        trades.history = trades.adjusted_volume()
+        net_shares = trades.history.groupby(trades.labels.TICKER)[
+            trades.labels.ADJUSTED_VOL
         ].sum()
         return net_shares
 
-    def _compute_average_purchase_price(self) -> pd.DataFrame:
+    def _compute_average_price(
+        self, trades: Trades, summary: pd.DataFrame
+    ) -> pd.DataFrame:
         """Computes average purchase price of assets."""
         # sum total and divide by net position
         avg_price = (
-            self.trades.history.groupby("ticker")[self.labels.TOTAL].sum()
-            / self.summary[self.labels.SHARES]
+            trades.history.groupby("ticker")[trades.labels.TOTAL].sum()
+            / summary[trades.labels.SHARES]
         )
         return avg_price
 
-    def _compute_profit_and_loss(self) -> pd.DataFrame:
+    def _compute_profit_and_loss(
+        self, trades: Trades, summary: pd.DataFrame
+    ) -> pd.DataFrame:
         """Computes profit or loss from market price."""
         profit_loss = (
-            (
-                self.summary[self.labels.MARKET_PRICE]
-                - self.summary[self.labels.AVG_PRICE]
-            )
-            / self.summary[self.labels.AVG_PRICE]
+            (summary[trades.labels.MARKET_PRICE] - summary[trades.labels.AVG_PRICE])
+            / summary[trades.labels.AVG_PRICE]
             * 100
         )
         return profit_loss
 
-    def _compute_market_value(self) -> pd.DataFrame:
+    def _compute_market_value(
+        self, trades: Trades, summary: pd.DataFrame
+    ) -> pd.DataFrame:
         """Compute current value from number of shares and market price."""
         market_value = (
-            self.summary[self.labels.MARKET_PRICE]
-            * self.summary[self.labels.SHARES]
+            summary[trades.labels.MARKET_PRICE] * summary[trades.labels.SHARES]
         )
         return market_value
 
-    def _get_current_price(self) -> pd.DataFrame:
+    def _get_current_price(self, summary: pd.DataFrame) -> pd.DataFrame:
         """Get current price from Yahoo finance."""
 
         def yahoo_market_price(x):
             try:
                 return yf.Ticker(x.name).quotes[x.name]["regularMarketPrice"]
             except (KeyError, TypeError):
-                warnings.warn(
-                    f"Quote not found for ticker symbol: {x.name}"
-                )
+                warnings.warn(f"Quote not found for ticker symbol: {x.name}")
                 return np.nan
 
-        market_price = self.summary.apply(lambda x: yahoo_market_price(x), axis=1)
+        market_price = summary.apply(lambda x: yahoo_market_price(x), axis=1)
 
         return market_price
 
-    def _get_sector(self) -> pd.DataFrame:
+    def _get_sector(self, summary: pd.DataFrame) -> pd.DataFrame:
         """Get assets business sector from Yahoo finance."""
 
         def yahoo_sector(x):
             try:
                 return yf.Ticker(x.name).asset_profile[x.name]["sector"]
             except (KeyError, TypeError):
-                return np.nan
+                return None
 
-        sector = self.summary.apply(
-            lambda x: yahoo_sector(x),
-            axis=1)
+        sector = summary.apply(lambda x: yahoo_sector(x), axis=1)
         return sector
 
-    def _get_long_name(self) -> pd.DataFrame:
+    def _get_long_name(self, summary: pd.DataFrame) -> pd.DataFrame:
         """Get long name of security from Yahoo finance."""
 
         def yahoo_long_name(x):
@@ -110,12 +122,10 @@ class Portfolio:
             except (KeyError, TypeError):
                 return np.nan
 
-        long_name = self.summary.apply(
-            lambda x: yahoo_long_name(x),
-            axis=1)
+        long_name = summary.apply(lambda x: yahoo_long_name(x), axis=1)
         return long_name
 
-    def _get_currency(self) -> pd.DataFrame:
+    def _get_currency(self, summary: pd.DataFrame) -> pd.DataFrame:
         """Get currency of security from Yahoo finance."""
 
         def yahoo_currency(x):
@@ -124,8 +134,19 @@ class Portfolio:
             except (KeyError, TypeError):
                 return np.nan
 
-        currency = self.summary.apply(
-            lambda x: yahoo_currency(x),
-            axis=1)
-                
+        currency = summary.apply(lambda x: yahoo_currency(x), axis=1)
+
+        return currency
+
+    def _get_asset_type(self, summary: pd.DataFrame) -> pd.DataFrame:
+        """Get currency of security from Yahoo finance."""
+
+        def yahoo_asset_type(x):
+            try:
+                return yf.Ticker(x.name).quotes[x.name]["quoteType"]
+            except (KeyError, TypeError):
+                return None
+
+        currency = summary.apply(lambda x: yahoo_asset_type(x), axis=1)
+
         return currency

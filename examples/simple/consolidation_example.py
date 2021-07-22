@@ -8,7 +8,6 @@ pd.set_option("display.max_columns", None)
 trades = portman.trades.Trades(
     trades_file="trades.csv",
 )
-print(trades.history)
 
-port = portman.portfolio.Portfolio(trades, 'simple_portfolio.csv')
+port = portman.portfolio.Portfolio(trades)
 print(port.summary)
