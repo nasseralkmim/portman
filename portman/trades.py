@@ -18,16 +18,22 @@ class Trades:
     """
 
     def __init__(
-        self,
-        trades_file: str,
-        columns: list[str] = None,
-        date_column: str = None,
-        dayfirst: bool = True,
+            self,
+            trades_file: str,
+            columns: list[str] = None,
+            date_column: str = None,
+            dayfirst: bool = True,
+            asset_class: str = None,
     ) -> None:
-
+        
         self.labels = Labels()  # composition of Labels
 
         self.columns = self._set_columns(columns)
+
+        if asset_class is None:
+            self.asset_class = trades_file.rsplit('.')[0]
+        else:
+            self.asset_class = asset_class
 
         # label of the column with dates
         if date_column is None:

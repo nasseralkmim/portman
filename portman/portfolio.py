@@ -27,6 +27,7 @@ class Portfolio:
         self.portfolio[self.labels.SECTOR] = self._get_sector()
         self.portfolio[self.labels.NAME] = self._get_long_name()
         self.portfolio[self.labels.CURRENCY] = self._get_currency()
+        self.portfolio[self.labels.ASSET_CLASS] = self.trades.asset_class
         self.portfolio.to_csv(portfolio_file)
 
     def _compute_net_shares(self) -> pd.DataFrame:
@@ -40,7 +41,7 @@ class Portfolio:
 
     def _compute_average_purchase_price(self) -> pd.DataFrame:
         """Computes average purchase price of assets."""
-        # naive, simple, implementation, just sum total and divide by net position
+        # sum total and divide by net position
         avg_price = (
             self.trades.history.groupby("ticker")[self.labels.TOTAL].sum()
             / self.portfolio[self.labels.SHARES]
@@ -48,7 +49,7 @@ class Portfolio:
         return avg_price
 
     def _compute_profit_and_loss(self) -> pd.DataFrame:
-        """Computes profit and loss."""
+        """Computes profit or loss from market price."""
         profit_loss = (
             (
                 self.portfolio[self.labels.MARKET_PRICE]

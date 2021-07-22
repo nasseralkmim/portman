@@ -39,42 +39,49 @@ cat portfolio_trades.csv
 #+end_src
 
 #+RESULTS:
-: ticker,shares,average price ($),market price ($),P/L %,market value ($),sector,name,currency
-: AMZN,20,17.5,3585.2,20386.85714285714,71704.0,Consumer Cyclical,"Amazon.com, Inc.",USD
-: GOOG,40,6.25,2652.01,42332.16,106080.40000000001,Communication Services,Alphabet Inc.,USD
+: ticker,shares,average price ($),market price ($),P/L %,market value ($),sector,name,currency,asset class
+: AMZN,20,17.5,3638.03,20688.742857142857,72760.6,Consumer Cyclical,"Amazon.com, Inc.",USD,trades
+: GOOG,40,6.25,2666.57,42565.12,106662.8,Communication Services,Alphabet Inc.,USD,trades
 
 ** As a /library/ in a script
 Can be used in script form.
 
-#+begin_src python
+#+begin_src python :session portman-library
 import portman.trades
 import portman.portfolio
 
-td = portman.trades.process("examples/trade_data.csv")
-por = portman.portfolio.process(td)
-print(por)
+trades = portman.trades.Trades("examples/simple/trades.csv", asset_class='stocks')
+porfolio = portman.portfolio.Portfolio(trades)
+print(porfolio.portfolio)
 #+end_src
 
 #+RESULTS:
-:         shares  average price ($)  market price ($)         P/L %  \
-: ticker                                                              
-: AMZN        20              17.50           3432.97  19516.971429   
-: GOOG        40               6.25           2527.37  40337.920000   
-: 
-:         market value ($)                  Sector  
-: ticker                                            
-: AMZN             68659.4       Consumer Cyclical  
-: GOOG            101094.8  Communication Services  
+#+begin_example
+        shares  average price ($)  market price ($)         P/L %  \
+ticker                                                              
+AMZN        20              17.50           3638.03  20688.742857   
+GOOG        40               6.25           2666.57  42565.120000   
+
+        market value ($)                  sector              name currency  \
+ticker                                                                        
+AMZN             72760.6       Consumer Cyclical  Amazon.com, Inc.      USD   
+GOOG            106662.8  Communication Services     Alphabet Inc.      USD   
+
+       asset class  
+ticker              
+AMZN        stocks  
+GOOG        stocks  
+#+end_example
 
 
 * Todo
-** TODO add multiple trades sources
+** TODO Abstract asset class from file or trade parameter
+
+** DONE add multiple trades sources
 
 1. end goal:
    1. =python -m portman.process "etf-trades.csv" "stocks-trades.csv"=
 2. trade source will _define an asset class_
-
-
 ** DONE add multiple currencies, use yahoo
 ** DONE use sensible defaults in trade object creation.
 1. sensible defaults reduce burden of knowledge about the class needs.
