@@ -11,7 +11,7 @@ class Portfolio:
     """Creates portfolio object."""
 
     def __init__(self, trades: Trades,
-                 portfolio_file: str = "portfolio.csv") -> None:
+                 portfolio_file: str = None) -> None:
         self.labels = trades.labels  # aggregation of Labels object
 
         self.trades = trades  # aggregation of Trades object
@@ -29,6 +29,9 @@ class Portfolio:
         self.portfolio[self.labels.CURRENCY] = self._get_currency()
         self.portfolio[self.labels.ASSET_CLASS] = self.trades.asset_class
         self.portfolio.to_csv(portfolio_file)
+        if portfolio_file is None:
+            portfolio_file = trades.trades_file
+        self.summary.to_csv(portfolio_file)
 
     def _compute_net_shares(self) -> pd.DataFrame:
         """Computes net position from trades."""

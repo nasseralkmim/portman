@@ -28,6 +28,8 @@ class Trades:
         
         self.labels = Labels()  # composition of Labels
 
+        self.trades_file = trades_file
+
         self.columns = self._set_columns(columns)
 
         if asset_class is None:
