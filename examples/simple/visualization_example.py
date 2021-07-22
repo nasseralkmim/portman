@@ -1,11 +1,12 @@
 import matplotlib.pyplot  as plt
 import portman.portvis.portfolio
 
-portman.portvis.portfolio.allocation("simple_portfolio.csv")
-portman.portvis.portfolio.summary("simple_portfolio.csv")
+portfolio_file = 'portfolio_trades.csv'
+portman.portvis.portfolio.allocation(portfolio_file)
+portman.portvis.portfolio.summary(portfolio_file)
 
-allocation = portman.portvis.portfolio.allocation_sunburst("simple_portfolio.csv")
-profit_loss = portman.portvis.portfolio.profit_loss_asset("simple_portfolio.csv")
+allocation = portman.portvis.portfolio.allocation_sunburst(portfolio_file)
+profit_loss = portman.portvis.portfolio.profit_loss_asset(portfolio_file)
 allocation.show()
 profit_loss.show()
 plt.show()

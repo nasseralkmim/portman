@@ -10,5 +10,5 @@ etf_trades = portman.trades.Trades('etf.csv')
 etfs = portman.portfolio.Portfolio(etf_trades)
 stocks = portman.portfolio.Portfolio(stocks_trades) 
 
-print(etfs.portfolio)
-print(stocks.portfolio)
+print(etfs.summary)
+print(stocks.summary)

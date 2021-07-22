@@ -16,21 +16,21 @@ class Portfolio:
 
         self.trades = trades  # aggregation of Trades object
 
-        self.portfolio = pd.DataFrame()
-        self.portfolio[self.labels.SHARES] = self._compute_net_shares()
-        self.portfolio[self.labels.AVG_PRICE] = self._compute_average_purchase_price()
+        self.summary = pd.DataFrame()
+        self.summary[self.labels.SHARES] = self._compute_net_shares()
+        self.summary[self.labels.AVG_PRICE] = self._compute_average_purchase_price()
         # remove net 0 positions
-        self.portfolio = self.portfolio[self.portfolio[self.labels.SHARES] != 0]
-        self.portfolio[self.labels.MARKET_PRICE] = self._get_current_price()
-        self.portfolio[self.labels.PL] = self._compute_profit_and_loss()
-        self.portfolio[self.labels.MARKET_VALUE] = self._compute_market_value()
-        self.portfolio[self.labels.SECTOR] = self._get_sector()
-        self.portfolio[self.labels.NAME] = self._get_long_name()
-        self.portfolio[self.labels.CURRENCY] = self._get_currency()
-        self.portfolio[self.labels.ASSET_CLASS] = self.trades.asset_class
-        self.portfolio.to_csv(portfolio_file)
+        self.summary = self.summary[self.summary[self.labels.SHARES] != 0]
+        self.summary[self.labels.MARKET_PRICE] = self._get_current_price()
+        self.summary[self.labels.PL] = self._compute_profit_and_loss()
+        self.summary[self.labels.MARKET_VALUE] = self._compute_market_value()
+        self.summary[self.labels.SECTOR] = self._get_sector()
+        self.summary[self.labels.NAME] = self._get_long_name()
+        self.summary[self.labels.CURRENCY] = self._get_currency()
+        self.summary[self.labels.ASSET_CLASS] = self.trades.asset_class
+
         if portfolio_file is None:
-            portfolio_file = trades.trades_file
+            portfolio_file = f'portfolio_{trades.trades_file}' 
         self.summary.to_csv(portfolio_file)
 
     def _compute_net_shares(self) -> pd.DataFrame:
@@ -47,7 +47,7 @@ class Portfolio:
         # sum total and divide by net position
         avg_price = (
             self.trades.history.groupby("ticker")[self.labels.TOTAL].sum()
-            / self.portfolio[self.labels.SHARES]
+            / self.summary[self.labels.SHARES]
         )
         return avg_price
 
@@ -55,10 +55,10 @@ class Portfolio:
         """Computes profit or loss from market price."""
         profit_loss = (
             (
-                self.portfolio[self.labels.MARKET_PRICE]
-                - self.portfolio[self.labels.AVG_PRICE]
+                self.summary[self.labels.MARKET_PRICE]
+                - self.summary[self.labels.AVG_PRICE]
             )
-            / self.portfolio[self.labels.AVG_PRICE]
+            / self.summary[self.labels.AVG_PRICE]
             * 100
         )
         return profit_loss
@@ -66,8 +66,8 @@ class Portfolio:
     def _compute_market_value(self) -> pd.DataFrame:
         """Compute current value from number of shares and market price."""
         market_value = (
-            self.portfolio[self.labels.MARKET_PRICE]
-            * self.portfolio[self.labels.SHARES]
+            self.summary[self.labels.MARKET_PRICE]
+            * self.summary[self.labels.SHARES]
         )
         return market_value
 
@@ -83,7 +83,7 @@ class Portfolio:
                 )
                 return np.nan
 
-        market_price = self.portfolio.apply(lambda x: yahoo_market_price(x), axis=1)
+        market_price = self.summary.apply(lambda x: yahoo_market_price(x), axis=1)
 
         return market_price
 
@@ -96,7 +96,7 @@ class Portfolio:
             except (KeyError, TypeError):
                 return np.nan
 
-        sector = self.portfolio.apply(
+        sector = self.summary.apply(
             lambda x: yahoo_sector(x),
             axis=1)
         return sector
@@ -110,7 +110,7 @@ class Portfolio:
             except (KeyError, TypeError):
                 return np.nan
 
-        long_name = self.portfolio.apply(
+        long_name = self.summary.apply(
             lambda x: yahoo_long_name(x),
             axis=1)
         return long_name
@@ -124,7 +124,7 @@ class Portfolio:
             except (KeyError, TypeError):
                 return np.nan
 
-        currency = self.portfolio.apply(
+        currency = self.summary.apply(
             lambda x: yahoo_currency(x),
             axis=1)
                 

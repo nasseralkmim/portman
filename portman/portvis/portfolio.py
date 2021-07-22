@@ -60,7 +60,8 @@ def allocation_sunburst(portfolio_file: str) -> plt.Figure:
     portfolio = pd.read_csv(portfolio_file)
     fig = px.sunburst(
         portfolio,
-        path=[labels.SECTOR,
+        path=[labels.ASSET_CLASS,
+              labels.SECTOR,
               labels.TICKER],
         values=labels.MARKET_VALUE
     )

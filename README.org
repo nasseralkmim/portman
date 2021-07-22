@@ -52,7 +52,7 @@ import portman.portfolio
 
 trades = portman.trades.Trades("examples/simple/trades.csv", asset_class='stocks')
 porfolio = portman.portfolio.Portfolio(trades)
-print(porfolio.portfolio)
+print(porfolio.summary)
 #+end_src
 
 #+RESULTS:
