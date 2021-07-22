@@ -29,20 +29,19 @@ date,type,ticker,shares,price,fee
 * Use =portman=
 :PROPERTIES:
 :header-args:python: :session demo
-:header-args:shell: :dir examples/
 :END:
 ** As a /program/ that acts on an input file
 Generates a =.csv= file by calling the =portman.process= module with the trades data,
 
-#+begin_src shell
-python -m portman.process "trade_data.csv"
-cat portfolio.csv
+#+begin_src shell :dir examples/simple
+python -m portman.process "trades.csv"
+cat portfolio_trades.csv
 #+end_src
 
 #+RESULTS:
-: ticker,shares,average price ($),market price ($),P/L %,market value ($),Sector
-: AMZN,20,17.5,3432.97,19516.971428571425,68659.4,Consumer Cyclical
-: GOOG,40,6.25,2527.37,40337.92,101094.79999999999,Communication Services
+: ticker,shares,average price ($),market price ($),P/L %,market value ($),sector,name,currency
+: AMZN,20,17.5,3585.2,20386.85714285714,71704.0,Consumer Cyclical,"Amazon.com, Inc.",USD
+: GOOG,40,6.25,2652.01,42332.16,106080.40000000001,Communication Services,Alphabet Inc.,USD
 
 ** As a /library/ in a script
 Can be used in script form.
@@ -71,7 +70,9 @@ print(por)
 * Todo
 ** TODO add multiple trades sources
 
-1. trade source will _define an asset class_
+1. end goal:
+   1. =python -m portman.process "etf-trades.csv" "stocks-trades.csv"=
+2. trade source will _define an asset class_
 
 
 ** DONE add multiple currencies, use yahoo
