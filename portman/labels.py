@@ -17,9 +17,9 @@ class Labels:
     PURCHASE_PRICE: str = "purchase price"
     TOTAL: str = "total"
     FEE: str = "fee"
-    BUY: str = "Buy"
-    SELL: str = "Sell"
-    SPLIT: str = "Split"
+    BUY: str = "buy"
+    SELL: str = "sell"
+    SPLIT: str = "split"
     NAME: str = 'name'
     CURRENCY: str = 'currency'
     ASSET_CLASS: str = 'asset class'

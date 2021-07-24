@@ -19,4 +19,4 @@ trades_file = args.trades
 
 for tf in trades_file:
     trades = portman.trades.Trades(trades_file=tf)
-    port = portman.portfolio.Portfolio(trades, f'portfolio_{tf}')
+    port = portman.portfolio.Portfolio(trades, 'portfolio.csv')

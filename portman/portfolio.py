@@ -23,6 +23,7 @@ class Portfolio:
         else:
             self.consolidated_trades.append(self._consolidate_trades(trades))
 
+        # Stack each trade consolidation on top of each other
         self.summary = pd.concat(self.consolidated_trades)
 
         if portfolio_file is None:

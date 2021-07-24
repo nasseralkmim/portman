@@ -93,10 +93,10 @@ class Trades:
         self.history[self.labels.ADJUSTED_VOL] = self.history.apply(
             lambda x: x[self.labels.SHARES]
             if x[self.labels.TYPE] in [self.labels.BUY, self.labels.SPLIT]
-            # make it negative if type is 'sell'
+            # make it negative if type is 'sell' positive otherwise
             else (
                 -x[self.labels.SHARES]
-                if x[self.labels.TYPE] in [self.labels.SELL]
+                if x[self.labels.TYPE].lower() in [self.labels.SELL]
                 else 0
             ),
             axis=1,
