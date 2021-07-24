@@ -17,6 +17,8 @@ parser.add_argument('trades',
 args = parser.parse_args()
 trades_file = args.trades
 
+trades = []
 for tf in trades_file:
-    trades = portman.trades.Trades(trades_file=tf)
-    port = portman.portfolio.Portfolio(trades, 'portfolio.csv')
+    trades.append(portman.trades.Trades(trades_file=tf))
+
+port = portman.portfolio.Portfolio(trades)
