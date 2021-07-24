@@ -94,6 +94,9 @@ class Trades:
 
         The type of the trade defines it the shares will add or subtract.
 
+        Raises:
+            If trade "type" in the .csv is not "buy", "sell" or "split".
+
         """
         def adjust_vol(x):
             if x[self.labels.TYPE].lower() in [self.labels.BUY, self.labels.SPLIT]:
@@ -103,7 +106,8 @@ class Trades:
                 return -x[self.labels.SHARES]
             else:
                 raise(f'Invalid trade type {x.TYPE}, fix the .csv')
+
         self.history[self.labels.ADJUSTED_VOL] = self.history.apply(
             lambda x: adjust_vol(x), axis=1)
-        print(self.history)
+
         return self.history
