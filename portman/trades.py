@@ -60,13 +60,18 @@ class Trades:
 
     def _set_transaction_total(self) -> pd.DataFrame:
         """Compute total transaction value into a new DF column."""
+
+        def total(x):
+            if x[self.labels.TYPE].lower() in [self.labels.BUY, self.labels.SPLIT]:
+                return x[self.labels.PURCHASE_PRICE] * x[self.labels.SHARES]
+            elif x[self.labels.TYPE].lower() in [self.labels.SELL]:
+                return -x[self.labels.PURCHASE_PRICE] * x[self.labels.SHARES]
+            else:
+                raise(f'Invalid trade type {x.TYPE}, fix the .csv')
+
         transaction_total = self.history.apply(
-            lambda x: x[self.labels.PURCHASE_PRICE] * x[self.labels.SHARES]
-            if x[self.labels.TYPE] in [self.labels.BUY, self.labels.SPLIT]
-            else -x[self.labels.PURCHASE_PRICE]
-            * x[self.labels.SHARES],  # negative sell
-            axis=1,
-        )
+                lambda x: total(x), axis=1,)
+
         return transaction_total
 
     def _set_columns(self, columns: list[str] = None) -> list[str]:
@@ -90,15 +95,15 @@ class Trades:
         The type of the trade defines it the shares will add or subtract.
 
         """
+        def adjust_vol(x):
+            if x[self.labels.TYPE].lower() in [self.labels.BUY, self.labels.SPLIT]:
+                return x[self.labels.SHARES]
+            elif x[self.labels.TYPE].lower() in [self.labels.SELL]:
+                # make it negative if type is 'sell' positive otherwise
+                return -x[self.labels.SHARES]
+            else:
+                raise(f'Invalid trade type {x.TYPE}, fix the .csv')
         self.history[self.labels.ADJUSTED_VOL] = self.history.apply(
-            lambda x: x[self.labels.SHARES]
-            if x[self.labels.TYPE] in [self.labels.BUY, self.labels.SPLIT]
-            # make it negative if type is 'sell' positive otherwise
-            else (
-                -x[self.labels.SHARES]
-                if x[self.labels.TYPE].lower() in [self.labels.SELL]
-                else 0
-            ),
-            axis=1,
-        )
+            lambda x: adjust_vol(x), axis=1)
+        print(self.history)
         return self.history
