@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import plotly.express as px
+import plotly.graph_objects as go
 
 from portman.labels import Labels
 
@@ -73,4 +74,14 @@ def profit_loss_asset(portfolio_file: str) -> plt.Figure:
     portfolio = pd.read_csv(portfolio_file)
     fig = px.bar(portfolio, x=labels.TICKER, y=labels.PL)
 
+    return fig
+
+def summary_table(portfolio_file: str) -> plt.Figure:
+    """Create summary table of portfolio."""
+    portfolio = pd.read_csv(portfolio_file)
+    fig = go.Figure(data=[
+        go.Table(
+            header=dict(values=portfolio.columns),
+            cells=dict(values=[i for i in portfolio.to_numpy().T]))
+    ])
     return fig

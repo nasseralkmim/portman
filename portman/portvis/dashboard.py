@@ -3,15 +3,13 @@
 Example:
         $python -m portman.portvis.dashboard "portfolio.csv"
 
-
 """
 import argparse
 
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-
-import portman.labels
+import dash_table
 
 import portman.portvis.portfolio
 
@@ -22,20 +20,32 @@ portfolio_file = args.portfolio
 
 app = dash.Dash(__name__)
 
+# layout describes what the application will look like
 app.layout = html.Div(
+    # list of components
     children=[
+        # html provides visual components for hmtl tags
         html.H1(children="portvis - Portfolio Visualizer"),
-        # dash core component
+
+        # dash core component (dcc) provides visual components
+        # higher level components (html, javascript, css)
+        # Graph render any plotly data visualization passed as the figure
         dcc.Graph(
             id="Allocation",
             figure=portman.portvis.portfolio.allocation_sunburst(
-                portfolio_file, portman.labels
+                portfolio_file
             ),
         ),
+
         dcc.Graph(
             id="P/L per asset",
-            figure=portman.portvis.portfolio.profit_loss_asset(portfolio_file, portman.labels),
+            figure=portman.portvis.portfolio.profit_loss_asset(portfolio_file),
         ),
+
+        dcc.Graph(
+            id="Table",
+            figure=portman.portvis.portfolio.summary_table(portfolio_file)
+        )
     ]
 )
 

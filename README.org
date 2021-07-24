@@ -73,6 +73,14 @@ AMZN        stocks
 GOOG        stocks  
 #+end_example
 
+** Dashboard
+
+After generating the processed portfolio file, we can visualize in a dashboard with
+
+#+begin_src shell :dir examples/two_sources
+python -m portman.portvis.dashboard "portfolio.csv"
+#+end_src
+
 
 * Todo
 ** TODO Abstract asset class from file or trade parameter
