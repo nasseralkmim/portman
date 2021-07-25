@@ -9,14 +9,18 @@
    3. current market price (what is the current price?).
    4. profit and loss on position (how much I'm gaining or losing?).
 3. Dashboard visualization of snapshot.
-   1. asset class distribution (stocks, etf, reit).
-   2. stocks distribution by sector.
+   1. asset class distribution (stocks, etf, reit, crypto, etc).
+   2. stocks distribution by sector and ticker.
+   3. etf distribution by factor and ticker.
 
 * Workflow
 
 1. Every trade is recorded in a =.csv= file.
    1. you can have multiple =.csv= for you own organizational purpose, I use one for each asset class or to separate currencies.
-2. If the input is the default format, you can just run as a program =python -m portman.process <file or list of data files>=
+   2. *need to be in specific format*
+2. Process the trades =python -m portman.process <file or list of data files>=
+3. Visualize with  =python -m portman.portvis <portfolio.csv>=
+   1. =portfolio.csv= is the default output file name
       
 
 * Input
@@ -83,8 +87,21 @@ python -m portman.portvis.dashboard "portfolio.csv"
 
 
 * Todo
-** TODO Abstract asset class from file or trade parameter
+** TODO Better sunburst
+1. or collect sector just for equity
+2. better:
+   1. one pie for asset distribution
+   2. one pie for etf, with factor
+   3. one pie for equity, with sector
 
+** TODO Consolidate value in single currency
+1. user defined
+2. default is dollar
+
+** TODO dashboard table with 2 decimals
+
+** DONE Abstract asset class from file or trade parameter
+1. Just used the yahoo data on asset class
 ** DONE add multiple trades sources
 
 1. end goal:
@@ -102,6 +119,7 @@ python -m portman.portvis.dashboard "portfolio.csv"
 2. it makes difference if you trade frequently.
 ** DONE check how import/export from potfolio-performance works.
 1. csv, good and complete, but it is not as smooth as I expected.
+
 * Changelog
 
 1. <2021-07-02 Fri> added back sub-packages for visualization, performance and income. Since there is a strong dependence of the dataframe structure between visualization and consolidation.
