@@ -76,8 +76,18 @@ class Trades:
             # negative total transaction value if sell
             elif x[self.labels.TYPE].lower() in [self.labels.SELL]:
                 return -x[self.labels.PURCHASE_PRICE] * x[self.labels.SHARES]
-            else:
-                raise (f"Invalid trade type {x.TYPE}, fix the .csv")
+            # trade type not valid
+            elif x[self.labels.TYPE] not in [
+                self.labels.BUY,
+                self.labels.SPLIT,
+                self.labels.SELL,
+            ]:
+                raise ValueError(
+                    f"Trade type in "
+                    f"{x[[self.labels.DATE, self.labels.TYPE, self.labels.TICKER]].values} "
+                    "should be one of "
+                    f"{(self.labels.BUY, self.labels.SPLIT, self.labels.SELL)}."
+                )
 
         transaction_total = self.history.apply(
             lambda x: total(x),
@@ -117,8 +127,18 @@ class Trades:
             elif x[self.labels.TYPE].lower() in [self.labels.SELL]:
                 # make it negative if type is 'sell' positive otherwise
                 return -x[self.labels.SHARES]
-            else:
-                print(f"Invalid trade type {x[self.labels.TYPE]}, fix the .csv")
+            # trade type not valid
+            elif x[self.labels.TYPE] not in [
+                self.labels.BUY,
+                self.labels.SPLIT,
+                self.labels.SELL,
+            ]:
+                raise ValueError(
+                    f"Trade type in "
+                    f"{x[[self.labels.DATE, self.labels.TYPE, self.labels.TICKER]].values} "
+                    "should be one of "
+                    f"{(self.labels.BUY, self.labels.SPLIT, self.labels.SELL)}."
+                )
 
         self.history[self.labels.ADJUSTED_VOL] = self.history.apply(
             lambda x: adjust_vol(x), axis=1
