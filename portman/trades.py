@@ -9,21 +9,22 @@ class Trades:
     """Process the trade data.
 
     Args:
-        dayfirst: date format starts with day by default.
+        trades_file: file name with extension.
         columns: list of labels to use as columns names in the dataframe.
             if `None` assume that the `trades_file` is in a specific order.
-            
-        dayfirst: date format starts with day or month.
+        dayfirst: date format starts with day by default (dd/mm/yyyy), if False,
+            date starts with month (mm/dd/yyyy).
 
+    Attributes:
+        labels: labels object with default strings.
+        trades_file: 
     """
-
     def __init__(
             self,
             trades_file: str,
             columns: list[str] = None,
             date_column: str = None,
             dayfirst: bool = True,
-            asset_class: str = None,
     ) -> None:
         
         self.labels = Labels()  # composition of Labels
@@ -31,11 +32,6 @@ class Trades:
         self.trades_file = trades_file
 
         self.columns = self._set_columns(columns)
-
-        if asset_class is None:
-            self.asset_class = trades_file.rsplit('.')[0]
-        else:
-            self.asset_class = asset_class
 
         # label of the column with dates
         if date_column is None:
@@ -62,8 +58,10 @@ class Trades:
         """Compute total transaction value into a new DF column."""
 
         def total(x):
+            # positive total transaction value if buy and split
             if x[self.labels.TYPE].lower() in [self.labels.BUY, self.labels.SPLIT]:
                 return x[self.labels.PURCHASE_PRICE] * x[self.labels.SHARES]
+            # negative total transaction value if sell
             elif x[self.labels.TYPE].lower() in [self.labels.SELL]:
                 return -x[self.labels.PURCHASE_PRICE] * x[self.labels.SHARES]
             else:
