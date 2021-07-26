@@ -1,41 +1,44 @@
-"""Encapsulates trade data from input file """
-from __future__ import annotations  # allows type hint list[str], dict[str, str]
+"""Encapsulates trade data into an object from input file.
+
+Each input file is a collection of transactions with specific information, each
+will be encapsulated in a `Trades` object.
+
+"""
+from __future__ import annotations  # allows type hint list[str] version < 3.9
 
 import pandas as pd
 from portman.labels import Labels
 
 
 class Trades:
-    """Process the trade data.
+    """Process trades data from input file.
 
     Args:
-        dayfirst: date format starts with day by default.
+        trades_file: file name with extension.
         columns: list of labels to use as columns names in the dataframe.
             if `None` assume that the `trades_file` is in a specific order.
-            
-        dayfirst: date format starts with day or month.
+        dayfirst: date format starts with day by default (dd/mm/yyyy), if False,
+            date starts with month (mm/dd/yyyy).
 
+    Attributes:
+        labels: labels object with default strings.
+        history: dataframe with transaction history from input file and
+            additional colums computed.
     """
 
     def __init__(
-            self,
-            trades_file: str,
-            columns: list[str] = None,
-            date_column: str = None,
-            dayfirst: bool = True,
-            asset_class: str = None,
+        self,
+        trades_file: str,
+        columns: list[str] = None,
+        date_column: str = None,
+        dayfirst: bool = True,
     ) -> None:
-        
+
         self.labels = Labels()  # composition of Labels
 
         self.trades_file = trades_file
 
         self.columns = self._set_columns(columns)
-
-        if asset_class is None:
-            self.asset_class = trades_file.rsplit('.')[0]
-        else:
-            self.asset_class = asset_class
 
         # label of the column with dates
         if date_column is None:
@@ -48,6 +51,11 @@ class Trades:
 
     def _get_trade_history(self, trades_file: str, dayfirst: bool) -> pd.DataFrame:
         """Parse trades file into a data frame."""
+
+        # TODO: make this more robust, right now is too fragile:
+        # separation in the input file must be: ','.
+        # names: must have a specific order, from the default columns values.
+        # date format: I'm trusting pandas `infer` function.
         trades = pd.read_csv(
             trades_file,
             sep=",",
@@ -62,20 +70,24 @@ class Trades:
         """Compute total transaction value into a new DF column."""
 
         def total(x):
+            # positive total transaction value if buy and split
             if x[self.labels.TYPE].lower() in [self.labels.BUY, self.labels.SPLIT]:
                 return x[self.labels.PURCHASE_PRICE] * x[self.labels.SHARES]
+            # negative total transaction value if sell
             elif x[self.labels.TYPE].lower() in [self.labels.SELL]:
                 return -x[self.labels.PURCHASE_PRICE] * x[self.labels.SHARES]
             else:
-                raise(f'Invalid trade type {x.TYPE}, fix the .csv')
+                raise (f"Invalid trade type {x.TYPE}, fix the .csv")
 
         transaction_total = self.history.apply(
-                lambda x: total(x), axis=1,)
+            lambda x: total(x),
+            axis=1,
+        )
 
         return transaction_total
 
     def _set_columns(self, columns: list[str] = None) -> list[str]:
-        """Set columns labels."""
+        """Set default or specified columns labels."""
         if columns is None:
             col = [
                 self.labels.DATE,
@@ -98,6 +110,7 @@ class Trades:
             If trade "type" in the .csv is not "buy", "sell" or "split".
 
         """
+
         def adjust_vol(x):
             if x[self.labels.TYPE].lower() in [self.labels.BUY, self.labels.SPLIT]:
                 return x[self.labels.SHARES]
@@ -105,9 +118,10 @@ class Trades:
                 # make it negative if type is 'sell' positive otherwise
                 return -x[self.labels.SHARES]
             else:
-                raise(f'Invalid trade type {x.TYPE}, fix the .csv')
+                print(f"Invalid trade type {x[self.labels.TYPE]}, fix the .csv")
 
         self.history[self.labels.ADJUSTED_VOL] = self.history.apply(
-            lambda x: adjust_vol(x), axis=1)
+            lambda x: adjust_vol(x), axis=1
+        )
 
         return self.history
