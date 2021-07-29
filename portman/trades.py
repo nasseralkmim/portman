@@ -1,4 +1,4 @@
-"""Encapsulates trade data into an object from input file.
+"""Encapsulates trade historical data into an object from input file.
 
 Each input file is a collection of transactions with specific information, each
 will be encapsulated in a `Trades` object.
@@ -11,7 +11,7 @@ from portman.labels import Labels
 
 
 class Trades:
-    """Process trades data from input file.
+    """Process trades historical data from input file.
 
     Args:
         trades_file: file name with extension.
