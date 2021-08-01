@@ -39,12 +39,13 @@ portfolio_summary = dcc.Graph(
     id="Table", figure=portman.portvis.portfolio.summary_table(portfolio_file)
 )
 
+
 # layout describes what the application will look like
 app.layout = html.Div(
     # list of components
     children=[
         # html provides visual components for hmtl tags
-        html.H1(children="Portfolio overview"),
+        html.H1(children="Portfolio Dashboard"),
         allocation_sunburst,
         profit_loss_bar,
         portfolio_summary,
@@ -53,4 +54,4 @@ app.layout = html.Div(
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True, threaded=True)
+    app.run_server(debug=True, threaded=True, use_reloader=True)
