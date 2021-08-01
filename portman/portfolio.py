@@ -37,7 +37,7 @@ class Portfolio:
 
         if portfolio_file is None:
             portfolio_file = f"portfolio.csv"
-        self.summary.to_csv(portfolio_file)
+        self.summary.to_csv(portfolio_file, float_format='%.2f')
 
     def _consolidate_trades(self, trades: Trades) -> pd.DataFrame:
         """Combine the transactions to get net position information."""
