@@ -62,8 +62,7 @@ def allocation_sunburst(portfolio_file: str) -> plt.Figure:
     fig = px.sunburst(
         portfolio,
         path=[labels.ASSET_CLASS,
-              labels.TICKER,
-              labels.SECTOR],
+              labels.TICKER],
         values=labels.MARKET_VALUE
     )
     return fig

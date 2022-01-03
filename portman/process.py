@@ -1,5 +1,7 @@
-"""Process the trades data and generate a '.csv' with portfolio processed
+"""This modulue performs the processing with a command line interface
 
+The processing consists of reading the trades files passed as arguments and
+generating the portfolio with the consolidated data.
 
 Example:
         $python -m portman.process "trades_file(s).csv"

@@ -1,12 +1,17 @@
-"""Encapsulates trade data from input file """
-from __future__ import annotations  # allows type hint list[str], dict[str, str]
+"""Encapsulates trade historical data into an object from input file.
+
+Each input file is a collection of transactions with specific information, each
+will be encapsulated in a `Trades` object.
+
+"""
+from __future__ import annotations  # allows type hint list[str] version < 3.9
 
 import pandas as pd
 from portman.labels import Labels
 
 
 class Trades:
-    """Process the trade data.
+    """Process trades historical data from input file.
 
     Args:
         trades_file: file name with extension.
@@ -17,16 +22,17 @@ class Trades:
 
     Attributes:
         labels: labels object with default strings.
-        trades_file: 
+        history: dataframe with transaction history from input file and
+            additional colums computed.
     """
     def __init__(
-            self,
-            trades_file: str,
-            columns: list[str] = None,
-            date_column: str = None,
-            dayfirst: bool = True,
+        self,
+        trades_file: str,
+        columns: list[str] = None,
+        date_column: str = None,
+        dayfirst: bool = True,
     ) -> None:
-        
+
         self.labels = Labels()  # composition of Labels
 
         self.trades_file = trades_file
@@ -44,6 +50,11 @@ class Trades:
 
     def _get_trade_history(self, trades_file: str, dayfirst: bool) -> pd.DataFrame:
         """Parse trades file into a data frame."""
+
+        # TODO: make this more robust, right now is too fragile:
+        # separation in the input file must be: ','.
+        # names: must have a specific order, from the default columns values.
+        # date format: I'm trusting pandas `infer` function.
         trades = pd.read_csv(
             trades_file,
             sep=",",
@@ -64,16 +75,28 @@ class Trades:
             # negative total transaction value if sell
             elif x[self.labels.TYPE].lower() in [self.labels.SELL]:
                 return -x[self.labels.PURCHASE_PRICE] * x[self.labels.SHARES]
-            else:
-                raise(f'Invalid trade type {x.TYPE}, fix the .csv')
+            # trade type not valid
+            elif x[self.labels.TYPE] not in [
+                self.labels.BUY,
+                self.labels.SPLIT,
+                self.labels.SELL,
+            ]:
+                raise ValueError(
+                    f"Trade type in "
+                    f"{x[[self.labels.DATE, self.labels.TYPE, self.labels.TICKER]].values} "
+                    "should be one of "
+                    f"{(self.labels.BUY, self.labels.SPLIT, self.labels.SELL)}."
+                )
 
         transaction_total = self.history.apply(
-                lambda x: total(x), axis=1,)
+            lambda x: total(x),
+            axis=1,
+        )
 
         return transaction_total
 
     def _set_columns(self, columns: list[str] = None) -> list[str]:
-        """Set columns labels."""
+        """Set default or specified columns labels."""
         if columns is None:
             col = [
                 self.labels.DATE,
@@ -96,16 +119,28 @@ class Trades:
             If trade "type" in the .csv is not "buy", "sell" or "split".
 
         """
+
         def adjust_vol(x):
             if x[self.labels.TYPE].lower() in [self.labels.BUY, self.labels.SPLIT]:
                 return x[self.labels.SHARES]
             elif x[self.labels.TYPE].lower() in [self.labels.SELL]:
                 # make it negative if type is 'sell' positive otherwise
                 return -x[self.labels.SHARES]
-            else:
-                raise(f'Invalid trade type {x.TYPE}, fix the .csv')
+            # trade type not valid
+            elif x[self.labels.TYPE] not in [
+                self.labels.BUY,
+                self.labels.SPLIT,
+                self.labels.SELL,
+            ]:
+                raise ValueError(
+                    f"Trade type in "
+                    f"{x[[self.labels.DATE, self.labels.TYPE, self.labels.TICKER]].values} "
+                    "should be one of "
+                    f"{(self.labels.BUY, self.labels.SPLIT, self.labels.SELL)}."
+                )
 
         self.history[self.labels.ADJUSTED_VOL] = self.history.apply(
-            lambda x: adjust_vol(x), axis=1)
+            lambda x: adjust_vol(x), axis=1
+        )
 
         return self.history
