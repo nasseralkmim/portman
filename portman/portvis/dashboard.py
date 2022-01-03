@@ -26,12 +26,14 @@ app = dash.Dash(__name__)
 allocation_sunburst = dcc.Graph(
     id="Allocation",
     figure=portman.portvis.portfolio.allocation_sunburst(portfolio_file),
+    style={"display": "inline-block"},
 )
 
 # bar plot with P/L for each asset
 profit_loss_bar = dcc.Graph(
     id="P/L per asset",
     figure=portman.portvis.portfolio.profit_loss_asset(portfolio_file),
+    style={"display": "inline-block"},
 )
 
 # table with portfolio data
@@ -54,4 +56,4 @@ app.layout = html.Div(
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True, threaded=True, use_reloader=True)
+    app.run_server(host="0.0.0.0", debug=False, threaded=True, use_reloader=True)
