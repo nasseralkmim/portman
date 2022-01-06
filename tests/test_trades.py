@@ -1,3 +1,4 @@
+"""Test if trades are correctly processed into a portfolio."""
 import os
 import pandas as pd
 import numpy as np
@@ -6,7 +7,7 @@ import portman.trades
 import portman.labels
 
 labels = portman.labels.Labels()
-file_name = os.path.join(os.path.dirname(__file__), "test_trades.csv")
+file_name = os.path.join(os.path.dirname(__file__), "trades.csv")
 trades = portman.trades.Trades(
     file_name,
     columns=[

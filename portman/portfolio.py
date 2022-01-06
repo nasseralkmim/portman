@@ -17,14 +17,23 @@ from portman.trades import Trades
 class Portfolio:
     """Creates portfolio object.
 
-    Attributes:
-        summary: consolidate all trades processed into single data frame."""
+    Parameters
+    ----------
+    trades
+        Trades object, see `~portoman.trades.Trades`.
+    portfolio_file
 
+    Attributes
+    ----------
+    summary : DataFrame
+        Consolidate all trades processed into single data frame.
+
+    """
     def __init__(
         self, trades: Union[Trades, list[Trades]], portfolio_file: str = None
     ) -> None:
 
-        # process one or a list of trades.
+        # process one or a list of trades
         self.trades_processed_collection = []
         if isinstance(trades, list):
             for t in trades:
@@ -32,14 +41,14 @@ class Portfolio:
         else:
             self.trades_processed_collection.append(self._consolidate_trades(trades))
 
-        # stack each trade consolidation on top of each other.
+        # stack each trade consolidation on top of each other
         self.summary = pd.concat(self.trades_processed_collection)
 
         if portfolio_file is None:
             portfolio_file = f"portfolio.csv"
         self.summary.to_csv(portfolio_file, float_format='%.2f')
 
-    def _consolidate_trades(self, trades: Trades) -> pd.DataFrame:
+    def _consolidate_trades(self, trades: Trades) -> DataFrame:
         """Combine the transactions to get net position information."""
         trades_processed = pd.DataFrame()
 
@@ -68,7 +77,7 @@ class Portfolio:
         )
         return trades_processed
 
-    def _compute_net_shares(self, trades: Trades) -> pd.DataFrame:
+    def _compute_net_shares(self, trades: Trades) -> DataFrame:
         """Computes net position from trades."""
         # adjust volume based on type
         trades.history = trades.adjusted_volume()
@@ -78,8 +87,8 @@ class Portfolio:
         return net_shares
 
     def _compute_average_price(
-        self, trades: Trades, summary: pd.DataFrame
-    ) -> pd.DataFrame:
+        self, trades: Trades, summary: DataFrame
+    ) -> DataFrame:
         """Computes average purchase price of assets."""
         # sum total and divide by net position
         avg_price = (
@@ -89,8 +98,8 @@ class Portfolio:
         return avg_price
 
     def _compute_profit_and_loss(
-        self, trades: Trades, summary: pd.DataFrame
-    ) -> pd.DataFrame:
+        self, trades: Trades, summary: DataFrame
+    ) -> DataFrame:
         """Computes profit or loss from market price."""
         profit_loss = (
             (summary[trades.labels.MARKET_PRICE] - summary[trades.labels.AVG_PRICE])
@@ -100,8 +109,8 @@ class Portfolio:
         return profit_loss
 
     def _compute_market_value(
-        self, trades: Trades, trades_processed: pd.DataFrame
-    ) -> pd.DataFrame:
+        self, trades: Trades, trades_processed: DataFrame
+    ) -> DataFrame:
         """Compute current value from number of shares and market price."""
         market_value = (
             trades_processed[trades.labels.MARKET_PRICE]
@@ -109,7 +118,7 @@ class Portfolio:
         )
         return market_value
 
-    def _get_current_price(self, trades_processed: pd.DataFrame) -> pd.DataFrame:
+    def _get_current_price(self, trades_processed: DataFrame) -> DataFrame:
         """Get current price from Yahoo finance."""
 
         def yahoo_market_price(x):
@@ -123,7 +132,7 @@ class Portfolio:
 
         return market_price
 
-    def _get_sector(self, summary: pd.DataFrame) -> pd.DataFrame:
+    def _get_sector(self, summary: DataFrame) -> DataFrame:
         """Get assets business sector from Yahoo finance."""
 
         def yahoo_sector(x):
@@ -135,7 +144,7 @@ class Portfolio:
         sector = summary.apply(lambda x: yahoo_sector(x), axis=1)
         return sector
 
-    def _get_long_name(self, trades_processed: pd.DataFrame) -> pd.DataFrame:
+    def _get_long_name(self, trades_processed: DataFrame) -> DataFrame:
         """Get long name of security from Yahoo finance."""
 
         def yahoo_long_name(x):
@@ -147,7 +156,7 @@ class Portfolio:
         long_name = trades_processed.apply(lambda x: yahoo_long_name(x), axis=1)
         return long_name
 
-    def _get_currency(self, trades_processed: pd.DataFrame) -> pd.DataFrame:
+    def _get_currency(self, trades_processed: DataFrame) -> DataFrame:
         """Get currency of security from Yahoo finance."""
 
         def yahoo_currency(x):
@@ -160,7 +169,7 @@ class Portfolio:
 
         return currency
 
-    def _get_asset_type(self, trades_processed: pd.DataFrame) -> pd.DataFrame:
+    def _get_asset_type(self, trades_processed: DataFrame) -> DataFrame:
         """Get currency of security from Yahoo finance."""
 
         def yahoo_asset_type(x):

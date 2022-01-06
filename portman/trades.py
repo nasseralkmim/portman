@@ -13,17 +13,25 @@ from portman.labels import Labels
 class Trades:
     """Process trades historical data from input file.
 
-    Args:
-        trades_file: file name with extension.
-        columns: list of labels to use as columns names in the dataframe.
-            if `None` assume that the `trades_file` is in a specific order.
-        dayfirst: date format starts with day by default (dd/mm/yyyy), if False,
-            date starts with month (mm/dd/yyyy).
+    Arguments
+    ---------
+    trades_file
+        file name with extension.
+    columns
+        list of labels to use as columns names in the dataframe.
+        if `None` assume that the `trades_file` is in a specific order.
+    dayfirst
+        date format starts with day by default (dd/mm/yyyy), if False,
+        date starts with month (mm/dd/yyyy).
 
-    Attributes:
-        labels: labels object with default strings.
-        history: dataframe with transaction history from input file and
-            additional colums computed.
+    Attributes
+    ----------
+    labels
+        labels object with default strings.
+    history
+        dataframe with transaction history from input file and
+        additional colums computed.
+
     """
     def __init__(
         self,
@@ -52,9 +60,9 @@ class Trades:
         """Parse trades file into a data frame."""
 
         # TODO: make this more robust, right now is too fragile:
-        # separation in the input file must be: ','.
-        # names: must have a specific order, from the default columns values.
-        # date format: I'm trusting pandas `infer` function.
+        # separation in the input file must be: ','
+        # names: must have a specific order, from the default columns values
+        # date format: I'm trusting pandas `infer` function
         trades = pd.read_csv(
             trades_file,
             sep=",",
@@ -115,7 +123,9 @@ class Trades:
 
         The type of the trade defines it the shares will add or subtract.
 
-        Raises:
+        Raises
+        ------
+        ValueError
             If trade "type" in the .csv is not "buy", "sell" or "split".
 
         """
