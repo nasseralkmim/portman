@@ -1,4 +1,5 @@
 *In development*
+* Overview
 
 =portman= is a package to process your trade data.
 
@@ -32,7 +33,7 @@ The input is a simple =.csv= file with your transaction history.
 date,type,ticker,shares,price,fee
 #+end_example
 
-* Use =portman=
+* How to  =portman=?
 :PROPERTIES:
 :header-args:python: :session demo
 :END:
@@ -88,6 +89,7 @@ python -m portman.portvis.dashboard "portfolio.csv"
 #+end_src
 
 
+* Dependencies
 * Todo
 ** TODO Better sunburst
 1. or collect sector just for equity
