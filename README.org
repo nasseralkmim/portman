@@ -33,7 +33,10 @@ The input is a simple =.csv= file with your transaction history.
 date,type,ticker,shares,price,fee
 #+end_example
 
-* How to  =portman=?
+* Installation
+Clone this repository and run =pip install .= in this folder (where =setup.py= is located).
+
+* How to use =portman=?
 :PROPERTIES:
 :header-args:python: :session demo
 :END:
@@ -87,7 +90,6 @@ After generating the processed portfolio file, we can visualize in a dashboard w
 #+begin_src shell :dir examples/two_sources
 python -m portman.portvis.dashboard "portfolio.csv"
 #+end_src
-
 
 * Dependencies
 * Todo
