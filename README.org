@@ -2,6 +2,7 @@
 * Overview
 
 =portman= is a package to process your trade data.
+The process consolidate the time data into a summary report.
 
 * Features
 
@@ -34,6 +35,7 @@ date,type,ticker,shares,price,fee
 #+end_example
 
 * Installation
+
 Clone this repository and run =pip install .= in this folder (where =setup.py= is located).
 
 * How to use =portman=?
@@ -45,43 +47,32 @@ Generates a =.csv= file by calling the =portman.process= module with the trades 
 
 #+begin_src shell :dir examples/simple
 python -m portman.process "trades.csv"
-cat portfolio_trades.csv
+cat portfolio.csv
 #+end_src
 
 #+RESULTS:
-: ticker,shares,average price ($),market price ($),P/L %,market value ($),sector,name,currency,asset class
-: AMZN,20,17.5,3638.03,20688.742857142857,72760.6,Consumer Cyclical,"Amazon.com, Inc.",USD,trades
-: GOOG,40,6.25,2666.57,42565.12,106662.8,Communication Services,Alphabet Inc.,USD,trades
+| ticker | shares | average price ($) | market price ($) |    P/L % | market value ($) | sector                 | name             | currency | asset class |
+| AMZN   |     20 |              17.5 |          2302.93 |  13059.6 |          46058.6 | Consumer Cyclical      | Amazon.com, Inc. | USD      | EQUITY      |
+| GOOG   |     40 |              6.25 |          2255.98 | 35995.68 |          90239.2 | Communication Services | Alphabet Inc.    | USD      | EQUITY      |
 
 ** As a /library/ in a script
 Can be used in script form.
 
-#+begin_src python :session portman-library
+#+begin_src python 
 import portman.trades
 import portman.portfolio
 
-trades = portman.trades.Trades("examples/simple/trades.csv", asset_class='stocks')
+trades = portman.trades.Trades("examples/simple/trades.csv")
 porfolio = portman.portfolio.Portfolio(trades)
 print(porfolio.summary)
 #+end_src
 
 #+RESULTS:
-#+begin_example
-        shares  average price ($)  market price ($)         P/L %  \
-ticker                                                              
-AMZN        20              17.50           3638.03  20688.742857   
-GOOG        40               6.25           2666.57  42565.120000   
+:         shares  average price ($)  market price ($)     P/L %  market value ($)                  sector              name currency asset class
+: ticker                                                                                                                                        
+: AMZN        20              17.50           2302.93  13059.60           46058.6       Consumer Cyclical  Amazon.com, Inc.      USD      EQUITY
+: GOOG        40               6.25           2255.98  35995.68           90239.2  Communication Services     Alphabet Inc.      USD      EQUITY
 
-        market value ($)                  sector              name currency  \
-ticker                                                                        
-AMZN             72760.6       Consumer Cyclical  Amazon.com, Inc.      USD   
-GOOG            106662.8  Communication Services     Alphabet Inc.      USD   
-
-       asset class  
-ticker              
-AMZN        stocks  
-GOOG        stocks  
-#+end_example
 
 ** Dashboard
 
@@ -91,43 +82,3 @@ After generating the processed portfolio file, we can visualize in a dashboard w
 python -m portman.portvis.dashboard "portfolio.csv"
 #+end_src
 
-* Dependencies
-* Todo
-** TODO Better sunburst
-1. or collect sector just for equity
-2. better:
-   1. one pie for asset distribution
-   2. one pie for etf, with factor
-   3. one pie for equity, with sector
-
-** TODO Consolidate value in single currency
-1. user defined
-2. default is dollar
-
-** TODO dashboard table with 2 decimals
-
-** DONE Abstract asset class from file or trade parameter
-1. Just used the yahoo data on asset class
-** DONE add multiple trades sources
-
-1. end goal:
-   1. =python -m portman.process "etf-trades.csv" "stocks-trades.csv"=
-2. trade source will _define an asset class_
-** DONE add multiple currencies, use yahoo
-** DONE use sensible defaults in trade object creation.
-1. sensible defaults reduce burden of knowledge about the class needs.
-2. keep flexible in case need to add new columns.
-** DONE change interface to avoid object creation outside.
-1. instead of creating a labels object and passing a instance, it is better to create the object inside the owner class.
-   1. portfolio object own trades and labels.
-** DONE check how average price was computed (trade.py).
-1. naive... but effective enough.
-2. it makes difference if you trade frequently.
-** DONE check how import/export from potfolio-performance works.
-1. csv, good and complete, but it is not as smooth as I expected.
-
-* Changelog
-
-1. <2021-07-02 Fri> added back sub-packages for visualization, performance and income. Since there is a strong dependence of the dataframe structure between visualization and consolidation.
-2. <2021-06-28 Mon> Moved visualization to a different package, =portvis=.
-   

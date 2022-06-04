@@ -108,3 +108,7 @@ ENV/
 !trades.csv
 !etf.csv
 !stocks.csv
+
+#emacs virtual comment
+.evc
+todo.org

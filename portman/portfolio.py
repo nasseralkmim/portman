@@ -5,13 +5,16 @@ refer to the same asset.
 
 """
 from __future__ import annotations
-from typing import Union
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pandas import DataFrame
+    from portman.trades import Trades
+
 import warnings
 import pandas as pd
 import numpy as np
 import yahooquery as yf
-
-from portman.trades import Trades
 
 
 class Portfolio:
@@ -20,17 +23,18 @@ class Portfolio:
     Parameters
     ----------
     trades
-        Trades object, see `~portoman.trades.Trades`.
+        Object with transactions data or list of those.
     portfolio_file
 
     Attributes
     ----------
-    summary : DataFrame
+    summary
         Consolidate all trades processed into single data frame.
 
     """
+
     def __init__(
-        self, trades: Union[Trades, list[Trades]], portfolio_file: str = None
+        self, trades: Trades | list[Trades], portfolio_file: str = None
     ) -> None:
 
         # process one or a list of trades
@@ -46,7 +50,7 @@ class Portfolio:
 
         if portfolio_file is None:
             portfolio_file = f"portfolio.csv"
-        self.summary.to_csv(portfolio_file, float_format='%.2f')
+        self.summary.to_csv(portfolio_file, float_format="%.2f")
 
     def _consolidate_trades(self, trades: Trades) -> DataFrame:
         """Combine the transactions to get net position information."""
@@ -86,9 +90,7 @@ class Portfolio:
         ].sum()
         return net_shares
 
-    def _compute_average_price(
-        self, trades: Trades, summary: DataFrame
-    ) -> DataFrame:
+    def _compute_average_price(self, trades: Trades, summary: DataFrame) -> DataFrame:
         """Computes average purchase price of assets."""
         # sum total and divide by net position
         avg_price = (
@@ -97,9 +99,7 @@ class Portfolio:
         )
         return avg_price
 
-    def _compute_profit_and_loss(
-        self, trades: Trades, summary: DataFrame
-    ) -> DataFrame:
+    def _compute_profit_and_loss(self, trades: Trades, summary: DataFrame) -> DataFrame:
         """Computes profit or loss from market price."""
         profit_loss = (
             (summary[trades.labels.MARKET_PRICE] - summary[trades.labels.AVG_PRICE])

@@ -12,15 +12,16 @@ import argparse
 import portman.portfolio
 import portman.trades
 
-parser = argparse.ArgumentParser(description='Consolidate trade data.')
-parser.add_argument('trades',
-                    help='`.csv` files with trade data',
-                    nargs='+')
-args = parser.parse_args()
-trades_file = args.trades
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Consolidate trade data.')
+    parser.add_argument('trades',
+                        help='`.csv` files with trade data',
+                        nargs='+')
+    args = parser.parse_args()
+    trades_file = args.trades
 
-trades = []
-for tf in trades_file:
-    trades.append(portman.trades.Trades(trades_file=tf))
+    trades = []
+    for tf in trades_file:
+        trades.append(portman.trades.Trades(trades_file=tf))
 
-port = portman.portfolio.Portfolio(trades)
+    port = portman.portfolio.Portfolio(trades)
