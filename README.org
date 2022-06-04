@@ -1,8 +1,7 @@
 *In development*
 * Overview
 
-=portman= is a package to process your trade data.
-The process consolidate the time data into a summary report.
+=portman= is a package to process your trade data and consolidate it into a summary report.
 
 * Features
 
